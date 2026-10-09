@@ -1,0 +1,1709 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Bits &amp; Bases Trainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: workbench — narrow control rail on the left; question card and truth table solver stacked on the right; one column on phones. */
+:root{
+  --bg:#e9eef2; --surface:#fbfcfd; --surface2:#f1f4f7; --ink:#14202b; --muted:#5a6a78; --line:#d2dae1;
+  --accent:#b8650f; --accent-soft:#f6e3cc; --sign:#2a5d8f; --sign-soft:#d9e6f3;
+  --good:#2b7a4b; --good-soft:#dcefe3; --bad:#b03636; --bad-soft:#f6dddd; --on-accent:#ffffff;
+  --g0:#b8650f; --g1:#2a5d8f; --g2:#2b7a4b; --g3:#8a3fa0;
+  --f-display:"Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --f-body:"IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#0e141a; --surface:#16202a; --surface2:#1c2833; --ink:#e2e9ef; --muted:#8c9cab; --line:#283643;
+  --accent:#e9a14c; --accent-soft:#3a2a17; --sign:#7fb2e6; --sign-soft:#1d3247;
+  --good:#5cc184; --good-soft:#173527; --bad:#ec7a7a; --bad-soft:#3b1f22; --on-accent:#1a1006;
+  --g0:#e9a14c; --g1:#7fb2e6; --g2:#5cc184; --g3:#c98be0; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#0e141a; --surface:#16202a; --surface2:#1c2833; --ink:#e2e9ef; --muted:#8c9cab; --line:#283643;
+  --accent:#e9a14c; --accent-soft:#3a2a17; --sign:#7fb2e6; --sign-soft:#1d3247;
+  --good:#5cc184; --good-soft:#173527; --bad:#ec7a7a; --bad-soft:#3b1f22; --on-accent:#1a1006;
+  --g0:#e9a14c; --g1:#7fb2e6; --g2:#5cc184; --g3:#c98be0; color-scheme:dark }
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55}
+.wrap{max-width:1160px;margin:0 auto;padding-inline:16px;padding-block:20px 48px;display:grid;gap:20px}
+code,.mono{font-family:var(--f-mono)}
+button{font:inherit;cursor:pointer;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.ov{text-decoration:overline;text-decoration-thickness:1.5px}
+
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:16px}
+.brand h1{font-family:var(--f-display);font-weight:800;font-size:clamp(1.7rem,4vw,2.4rem);line-height:1;margin:0;letter-spacing:-.02em;text-wrap:balance}
+.brand h1 span{color:var(--accent)}
+.brand p{margin:.35rem 0 0;color:var(--muted)}
+.stats{display:flex;gap:6px;flex-wrap:wrap;align-items:stretch}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 12px;min-width:84px}
+.stat b{display:block;font-family:var(--f-mono);font-size:1.15rem;font-variant-numeric:tabular-nums}
+.stat small{font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.linkbtn{background:none;border:0;color:var(--muted);text-decoration:underline;font-size:.8rem;padding:4px}
+
+.grid{display:grid;grid-template-columns:290px minmax(0,1fr);gap:20px;align-items:start}
+.maincol{display:grid;gap:20px;min-width:0}
+@media (max-width:840px){.grid{grid-template-columns:minmax(0,1fr)}}
+
+.rail{display:grid;gap:18px}
+.group h2{font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);margin:0 0 8px;font-weight:600}
+.group h3{font-size:.8rem;margin:10px 0 6px;font-weight:600}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{position:relative}
+.chip input{position:absolute;opacity:0;inset:0;cursor:pointer;margin:0}
+.chip span{display:inline-block;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 11px;font-size:.85rem;transition:background .15s,border-color .15s}
+.chip input:checked + span{background:var(--ink);color:var(--surface);border-color:var(--ink)}
+.chip input:focus-visible + span{outline:2px solid var(--accent);outline-offset:2px}
+.mini{display:flex;gap:10px;margin-top:8px}
+.seg{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--surface)}
+.seg button{border:0;background:none;padding:8px 4px;font-size:.85rem;line-height:1.2}
+.seg button small{display:block;color:var(--muted);font-size:.7rem}
+.seg button+button{border-left:1px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--accent-soft);font-weight:600}
+.seg button[aria-pressed="true"] small{color:var(--accent)}
+
+.ref{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.ref summary{cursor:pointer;font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);font-weight:600}
+.ref[open] summary{margin-bottom:8px}
+.ref table{width:100%;border-collapse:collapse;font-size:.82rem;font-variant-numeric:tabular-nums}
+.ref td,.ref th{padding:3px 4px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+.ref th{font-weight:600;color:var(--muted);font-size:.7rem;text-transform:uppercase;letter-spacing:.06em;padding-top:10px}
+.ref.units td:nth-child(2){font-family:var(--f-mono);color:var(--muted)}
+.ref.units td:last-child{font-family:var(--f-mono);text-align:right}
+.ref .ex{font-size:.78rem;color:var(--muted);margin:10px 0 0;line-height:1.45}
+.ref .ex b{color:var(--ink);font-family:var(--f-mono);font-weight:500}
+.ref.gates td,.ref.gates th{text-align:center;font-family:var(--f-mono);padding:3px 2px}
+.ref.gates th{font-size:.62rem;letter-spacing:.02em;padding-top:4px}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:clamp(16px,3vw,28px);min-width:0}
+#qArea{display:grid;gap:18px}
+.emptyState{display:grid;gap:14px;justify-items:start;padding-block:12px}
+.emptyState h2{font-family:var(--f-display);font-size:1.5rem;margin:0;letter-spacing:-.01em}
+.emptyState p{margin:0;color:var(--muted);max-width:52ch}
+.preview{display:flex;gap:4px}
+.preview b{display:grid;place-items:center;width:2rem;height:2.2rem;border:1px dashed var(--line);border-radius:6px;font-family:var(--f-mono);color:var(--muted);font-weight:500}
+
+.qmeta{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:.75rem;text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}
+.qmeta .pill{background:var(--surface2);border:1px solid var(--line);border-radius:999px;padding:2px 10px;color:var(--ink)}
+.qnum{margin-left:auto;font-family:var(--f-mono)}
+.qbody{font-size:1.12rem;min-width:0}
+.qbody p{margin:0 0 12px}
+.big{font-family:var(--f-mono);font-size:1.5rem;font-weight:600;letter-spacing:.04em;word-break:break-word}
+.expr{font-family:var(--f-mono);font-size:1.15rem;font-weight:600;background:var(--surface2);border:1px solid var(--line);border-radius:8px;padding:8px 12px;display:inline-block;max-width:100%;overflow-x:auto}
+.unit{font-family:var(--f-body);font-weight:600}
+.vals{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
+.vals span{font-family:var(--f-mono);background:var(--sign-soft);color:var(--ink);border-radius:6px;padding:3px 10px;font-weight:600}
+
+/* registers */
+.regwrap{overflow-x:auto;padding-bottom:4px}
+.reg{display:inline-grid;grid-auto-flow:column;gap:4px;border-radius:9px;padding:3px;border:2px solid transparent}
+.cell{display:flex;flex-direction:column;align-items:center;gap:3px}
+.cell small{font-family:var(--f-mono);font-size:.62rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.cell b,.abit{display:grid;place-items:center;width:2.35rem;height:2.6rem;border:1px solid var(--line);border-radius:6px;background:var(--surface2);font-family:var(--f-mono);font-size:1.2rem;font-weight:500;color:var(--muted)}
+.cell b.one{color:var(--ink);font-weight:600;border-color:color-mix(in srgb,var(--ink) 35%,var(--line))}
+.cell b.fill{border:2px dashed var(--accent);background:var(--accent-soft)}
+.cell b.sign{border:2px solid var(--sign);background:var(--sign-soft)}
+.tap{background:var(--surface);border:2px solid var(--line);padding:0;font-family:var(--f-mono);font-size:1.15rem;color:var(--muted);transition:border-color .12s,background .12s;border-radius:6px}
+.tap:hover{border-color:var(--muted)}
+.tap.set{color:var(--ink);font-weight:600}
+.tap.blank{border-style:dashed}
+.tap.ok{border-color:var(--good);background:var(--good-soft)}
+.tap.bad{border-color:var(--bad);background:var(--bad-soft)}
+.abit.sb{border-color:var(--sign)}
+.reg.ok{border-color:var(--good);background:var(--good-soft)}
+.reg.bad{border-color:var(--bad);background:var(--bad-soft)}
+.lost{font-family:var(--f-mono);color:var(--bad);text-decoration:line-through}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:.8rem;color:var(--muted);margin-top:6px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;vertical-align:-1px;margin-right:5px}
+.legend .lf{border:2px dashed var(--accent);background:var(--accent-soft)}
+.legend .ls{border:2px solid var(--sign);background:var(--sign-soft)}
+.arrowline{font-family:var(--f-mono);font-size:.85rem;color:var(--accent);margin:6px 0 0;font-weight:500}
+.sumgrid{display:grid;grid-template-columns:auto auto;gap:4px 8px;align-items:end;justify-content:start}
+.sumgrid .op{font-family:var(--f-mono);font-size:1.3rem;font-weight:600;color:var(--muted);padding-bottom:.5rem;text-align:right}
+
+/* answer */
+form.ans{display:grid;gap:10px}
+.lab{font-size:.8rem;color:var(--muted)}
+.lab b{color:var(--ink);font-weight:600}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.txt{flex:1 1 200px;min-width:0;font-family:var(--f-mono);font-size:1.2rem;padding:9px 12px;border:1.5px solid var(--line);border-radius:8px;background:var(--surface2);color:var(--ink)}
+.txt:focus{border-color:var(--accent);outline:none}
+.txt.ok{border-color:var(--good);background:var(--good-soft)}
+.txt.bad{border-color:var(--bad);background:var(--bad-soft)}
+.pairs{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.pairs label{display:grid;gap:4px}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:9px 14px;font-weight:500}
+.btn:hover{border-color:var(--muted)}
+.btn.sm{padding:5px 10px;font-size:.82rem}
+.btn.primary{background:var(--ink);color:var(--surface);border-color:var(--ink);font-weight:600;padding-inline:20px}
+.btn.next{background:var(--accent);border-color:var(--accent);color:var(--on-accent);font-weight:600}
+.tools{display:flex;gap:8px;flex-wrap:wrap}
+.lostline{font-size:.85rem;color:var(--muted)}
+.bench{display:grid;gap:10px;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:12px 14px;min-width:0}
+
+.opts{display:grid;gap:8px}
+.opts.inline{display:flex;flex-wrap:wrap}
+.opt{display:flex;gap:10px;align-items:flex-start;text-align:left;border:1.5px solid var(--line);background:var(--surface);border-radius:9px;padding:10px 12px;font-size:.95rem;line-height:1.45}
+.opt .k{font-family:var(--f-mono);font-weight:600;color:var(--muted);flex:none}
+.opt.bitopt{font-family:var(--f-mono);font-size:1.6rem;font-weight:600;width:4.2rem;height:3.6rem;justify-content:center;align-items:center;padding:0}
+.opt[aria-checked="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.opt[aria-checked="true"] .k{color:var(--accent)}
+.opt.ok{border-color:var(--good);background:var(--good-soft)}
+.opt.bad{border-color:var(--bad);background:var(--bad-soft)}
+
+/* truth tables and K-maps */
+.tbl{overflow-x:auto;max-width:100%}
+.tbl table{border-collapse:collapse;font-family:var(--f-mono);font-size:.85rem;font-variant-numeric:tabular-nums}
+.tbl td,.tbl th{border:1px solid var(--line);padding:4px 8px;text-align:center}
+.tbl th{background:var(--surface2);font-weight:500;color:var(--muted)}
+.tbl td.on{background:var(--accent-soft);font-weight:600;color:var(--ink)}
+.tbl th.out,.tbl td.out{border-left:2px solid var(--ink)}
+.tbl td.out{font-weight:600;color:var(--ink)}
+.tbl th.mid{font-size:.72rem;white-space:nowrap}
+.tbl .tap{width:2.2rem;height:2rem;font-size:1rem}
+table.tt td{padding:3px 10px}
+table.kmap td{position:relative;width:3.4rem;height:3rem;padding:0;font-size:1.05rem}
+table.kmap td .kv{font-weight:600}
+table.kmap td.on{background:var(--accent-soft)}
+table.kmap td .mi{position:absolute;right:3px;bottom:1px;font-size:.58rem;color:var(--muted);font-weight:400}
+table.kmap td .tags{position:absolute;left:3px;top:2px;display:flex;gap:2px}
+table.kmap .gt{font-style:normal;font-size:.6rem;font-weight:600;color:var(--surface);border-radius:3px;padding:0 3px;line-height:1.3}
+.gt.g0{background:var(--g0)} .gt.g1{background:var(--g1)} .gt.g2{background:var(--g2)} .gt.g3{background:var(--g3)}
+table.kmap .tap{width:2.6rem;height:2.3rem}
+table.kmap th.corner{font-size:.7rem}
+
+.fb{border-radius:8px;padding:10px 14px;font-weight:500}
+.fb.ok{background:var(--good-soft);color:var(--good)}
+.fb.no{background:var(--bad-soft);color:var(--bad)}
+.fb.info{background:var(--surface2);color:var(--ink);font-weight:400}
+
+.steps{border-top:1px solid var(--line);padding-top:16px;display:grid;gap:12px;min-width:0}
+.steps h3{margin:0;font-family:var(--f-display);font-size:1.05rem}
+.steps ol{margin:0;padding-left:1.3rem;display:grid;gap:10px;min-width:0}
+.steps li{padding-left:4px;min-width:0}
+.steps li > p{margin:0 0 6px}
+.final{background:var(--accent-soft);border-radius:8px;padding:8px 12px;font-family:var(--f-mono);font-weight:600;display:inline-block}
+.note{font-size:.85rem;color:var(--muted)}
+
+.bexprnote{}
+/* gate diagrams and circuit builder */
+.diag{overflow-x:auto;max-width:100%;margin:4px 0 10px}
+.diag svg{display:block;max-width:100%;height:auto}
+.gbody{fill:var(--surface);stroke:var(--ink);stroke-width:2;stroke-linejoin:round}
+.gline{fill:none;stroke:var(--ink);stroke-width:2}
+.glead{stroke:var(--ink);stroke-width:2}
+.glab{font-family:var(--f-mono);font-size:10px;fill:var(--muted);text-anchor:middle}
+.dlab{font-family:var(--f-mono);font-size:14px;font-weight:600;fill:var(--ink)}
+.dval{font-family:var(--f-mono);font-size:12px;font-weight:700;fill:var(--accent)}
+.dot{fill:var(--ink)}
+.wire{fill:none;stroke-width:2.5;stroke-linejoin:round}
+.wire.plain{stroke:var(--ink);stroke-width:2}
+.wire.hi{stroke:var(--accent)}
+.wire.lo{stroke:var(--muted)}
+.wire.unk{stroke:var(--muted);stroke-dasharray:5 4}
+.wire.tmp{stroke:var(--sign);stroke-dasharray:6 4;pointer-events:none}
+.wirehit{fill:none;stroke:transparent;stroke-width:14;cursor:pointer}
+.builder{display:grid;gap:10px;min-width:0}
+.palette{display:flex;flex-wrap:wrap;gap:6px}
+.pal{display:flex;flex-direction:column;align-items:center;gap:1px;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:5px 8px 3px;font-size:.68rem;font-family:var(--f-mono);font-weight:600;touch-action:none;cursor:grab;user-select:none}
+.pal:hover{border-color:var(--accent)}
+.canvaswrap{overflow-x:auto;border:1.5px solid var(--line);border-radius:10px;background-color:var(--surface2);background-image:radial-gradient(var(--line) 1px,transparent 1px);background-size:18px 18px}
+.canvaswrap.ok{border-color:var(--good)} .canvaswrap.bad{border-color:var(--bad)}
+svg.canvas{display:block;width:100%;min-width:560px;height:auto;touch-action:none;user-select:none;-webkit-user-select:none}
+.ghit{fill:transparent}
+.gate{cursor:grab}
+.gate.sel .gbody{stroke:var(--accent);stroke-width:2.5}
+.port{fill:var(--surface);stroke:var(--muted);stroke-width:2;cursor:crosshair}
+.port.out{fill:var(--sign-soft);stroke:var(--sign)}
+.port.conn{fill:var(--ink);stroke:var(--ink)}
+.port.pend{fill:var(--accent);stroke:var(--accent)}
+.sw{fill:var(--surface);stroke:var(--line);stroke-width:1.5}
+.sw.on{fill:var(--accent-soft);stroke:var(--accent)}
+.swt{font-family:var(--f-mono);font-size:13px;font-weight:600;fill:var(--ink);text-anchor:middle;pointer-events:none}
+.inpin{cursor:pointer}
+.lamp{fill:var(--surface);stroke:var(--muted);stroke-width:2}
+.lamp.on{fill:var(--accent);stroke:var(--accent)}
+.lampt{font-family:var(--f-mono);font-size:14px;font-weight:700;fill:var(--ink);text-anchor:middle;pointer-events:none}
+.lampt.on{fill:var(--on-accent)}
+.del{cursor:pointer} .del circle{fill:var(--bad)} .del text{fill:var(--surface);font-size:15px;font-weight:700;text-anchor:middle;pointer-events:none}
+.builder.locked .palette,.builder.locked [data-act="clear"]{opacity:.45;pointer-events:none}
+.bfoot{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;align-items:center}
+.bexpr{font-family:var(--f-mono);font-size:.95rem;min-width:0;word-break:break-word}
+.legend2 span{font-family:var(--f-body);font-weight:400;background:var(--surface2);border:1px solid var(--line)}
+.legend2 b{font-family:var(--f-mono)}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.tabs button{background:none;border:0;border-bottom:2.5px solid transparent;padding:6px 12px 8px;font-family:var(--f-display);font-weight:600;font-size:1.15rem;color:var(--muted);margin-bottom:-1px}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.panel{display:grid;gap:14px;min-width:0}
+/* solver */
+.solver{display:grid;gap:14px}
+.solver h2{font-family:var(--f-display);font-size:1.35rem;margin:0;letter-spacing:-.01em}
+.solver .sub{margin:0;color:var(--muted);font-size:.9rem;max-width:70ch}
+.solver form{display:flex;gap:8px;flex-wrap:wrap}
+.exs{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.exs .lab{margin-right:4px}
+.exbtn{border:1px dashed var(--line);background:none;border-radius:999px;padding:2px 10px;font-family:var(--f-mono);font-size:.8rem}
+.exbtn:hover{border-color:var(--accent);color:var(--accent)}
+.sout{display:grid;gap:14px;min-width:0}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.fact{background:var(--surface2);border-radius:8px;padding:8px 12px;min-width:0}
+.fact small{display:block;font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.fact b{font-family:var(--f-mono);font-weight:600;word-break:break-word}
+@media (prefers-reduced-motion:no-preference){.flash{animation:pop .3s ease}@keyframes pop{from{transform:translateY(4px);opacity:.5}to{transform:none;opacity:1}}}
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <h1>Bits <span>&amp;</span> Bases</h1>
+      <p>Shifts, binary arithmetic, negative numbers, number bases, memory units and logic.</p>
+    </div>
+    <div class="stats" aria-live="polite">
+      <div class="stat"><b id="sScore">0 / 0</b><small>Correct</small></div>
+      <div class="stat"><b id="sStreak">0</b><small>Streak</small></div>
+      <div class="stat"><b id="sBest">0</b><small>Best streak</small></div>
+      <button class="linkbtn" id="resetStats" type="button">Reset score</button>
+    </div>
+  </header>
+
+  <div class="grid">
+    <aside class="rail">
+      <div class="group">
+        <h2>Topics</h2>
+        <h3>Shifts (8-bit register)</h3>
+        <div class="chips" data-set="shift"></div>
+        <h3>Binary arithmetic</h3>
+        <div class="chips" data-set="arith"></div>
+        <h3>Negative numbers</h3>
+        <div class="chips" data-set="signed"></div>
+        <h3>Number bases</h3>
+        <div class="chips" data-set="base"></div>
+        <h3>Memory units</h3>
+        <div class="chips" data-set="mem"></div>
+        <h3>Logic</h3>
+        <div class="chips" data-set="logic"></div>
+        <div class="mini"><button class="linkbtn" id="allT" type="button">Select all</button><button class="linkbtn" id="noneT" type="button">Clear</button></div>
+      </div>
+      <div class="group">
+        <h2>Difficulty</h2>
+        <div class="seg" id="diff">
+          <button type="button" data-d="1">Easy<small>start here</small></button>
+          <button type="button" data-d="2">Medium<small>exam level</small></button>
+          <button type="button" data-d="3">Hard<small>stretch</small></button>
+        </div>
+      </div>
+      <details class="ref units" open>
+        <summary>Unit ladder</summary>
+        <table>
+          <tr><th>Bits and bytes</th><th></th><th>Size</th></tr>
+          <tr><td>1 bit</td><td>b</td><td>one 0 or 1</td></tr>
+          <tr><td>1 nibble</td><td></td><td>4 bits</td></tr>
+          <tr><td>1 byte</td><td>B</td><td>8 bits</td></tr>
+          <tr><th>Decimal (SI)</th><th></th><th>Bytes</th></tr>
+          <tr><td>1 kilobyte</td><td>KB</td><td>1,000</td></tr>
+          <tr><td>1 megabyte</td><td>MB</td><td>1,000²</td></tr>
+          <tr><td>1 gigabyte</td><td>GB</td><td>1,000³</td></tr>
+          <tr><td>1 terabyte</td><td>TB</td><td>1,000⁴</td></tr>
+          <tr><th>Binary (IEC)</th><th></th><th>Bytes</th></tr>
+          <tr><td>1 kibibyte</td><td>KiB</td><td>1,024</td></tr>
+          <tr><td>1 mebibyte</td><td>MiB</td><td>1,024²</td></tr>
+          <tr><td>1 gibibyte</td><td>GiB</td><td>1,024³</td></tr>
+          <tr><td>1 tebibyte</td><td>TiB</td><td>1,024⁴</td></tr>
+        </table>
+        <p class="ex">Mixing the two? Go through bytes.<br><b>1 MiB</b> = 1,024 × 1,024 = <b>1,048,576 B</b> ÷ 1,000 = <b>1,048.576 KB</b></p>
+      </details>
+      <details class="ref gates">
+        <summary>Logic gate truth tables</summary>
+        <table>
+          <tr><th>A</th><th>B</th><th>AND</th><th>OR</th><th>NAND</th><th>NOR</th><th>XOR</th><th>XNOR</th></tr>
+          <tr><td>0</td><td>0</td><td>0</td><td>0</td><td>1</td><td>1</td><td>0</td><td>1</td></tr>
+          <tr><td>0</td><td>1</td><td>0</td><td>1</td><td>1</td><td>0</td><td>1</td><td>0</td></tr>
+          <tr><td>1</td><td>0</td><td>0</td><td>1</td><td>1</td><td>0</td><td>1</td><td>0</td></tr>
+          <tr><td>1</td><td>1</td><td>1</td><td>1</td><td>0</td><td>0</td><td>0</td><td>1</td></tr>
+        </table>
+        <p class="ex">NOT flips its single input: NOT 0 = 1, NOT 1 = 0. In expressions, A' or <span class="ov">A</span> means NOT A, A·B or AB means A AND B, A + B means A OR B.</p>
+      </details>
+    </aside>
+
+    <div class="maincol">
+    <main class="card" id="card">
+      <div class="emptyState" id="empty">
+        <div class="preview" aria-hidden="true"><b>?</b><b>?</b><b>?</b><b>?</b><b>?</b><b>?</b><b>?</b><b>?</b></div>
+        <h2>Pick a topic to start</h2>
+        <p>Choose one or more topics on the left. A question on that topic appears here straight away, starting at Easy. Every question is newly generated, so you can keep practising.</p>
+      </div>
+      <div id="qArea" hidden>
+        <div class="qmeta"><span class="pill" id="qTopic">Topic</span><span id="qDiff"></span><span class="qnum" id="qNum">Q1</span></div>
+        <div class="qbody" id="qBody"></div>
+        <form class="ans" id="form" autocomplete="off"><div id="ansArea" style="display:grid;gap:10px;min-width:0"></div></form>
+        <div class="tools">
+          <button class="btn" id="hintBtn" type="button">Hint</button>
+          <button class="btn" id="solveBtn" type="button">Show working</button>
+          <button class="btn next" id="nextBtn" type="button">New question →</button>
+        </div>
+        <div id="fb" hidden></div>
+        <section class="steps" id="steps" hidden></section>
+      </div>
+    </main>
+
+    <section class="card solver" id="tools">
+      <div class="tabs" role="tablist" aria-label="Tools">
+        <button type="button" role="tab" aria-selected="true" data-tab="builder">Circuit builder</button>
+        <button type="button" role="tab" aria-selected="false" data-tab="solver">Truth table solver</button>
+      </div>
+      <div class="panel" id="panel-builder" role="tabpanel">
+        <p class="sub">Drag gates onto the board (or tap one to add it). Drag from a blue output dot to a white input dot to wire it. Tap an input on the left to switch it between 0 and 1, and watch the lamp. Tap a wire to remove it; select a gate and tap × to delete it.</p>
+        <div class="row"><button type="button" class="btn next" id="practiseBuild">Practise: build a circuit and its truth table</button><span class="note">Opens a question in the practice card above.</span></div>
+        <div id="sandbox"></div>
+      </div>
+      <div class="panel" id="panel-solver" role="tabpanel" hidden>
+        <p class="sub">Type any logic expression to see its full truth table, including the in-between columns. Use letters for inputs with AND, OR, NOT, NAND, NOR, XOR, XNOR, or the symbols . + ' ¬ ⊕ and brackets.</p>
+        <form id="solveForm" autocomplete="off">
+          <input id="solveIn" class="txt" spellcheck="false" value="(A AND B) OR NOT C" aria-label="Logic expression">
+          <button class="btn primary" type="submit">Solve</button>
+        </form>
+        <div class="exs"><span class="lab">Try:</span></div>
+        <div class="sout" id="solveOut"></div>
+      </div>
+    </section>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+const $=s=>document.querySelector(s);
+const rnd=(a,b)=>Math.floor(Math.random()*(b-a+1))+a;
+const pick=a=>a[rnd(0,a.length-1)];
+const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=rnd(0,i);[a[i],a[j]]=[a[j],a[i]];}return a;};
+const bin=(x,w)=>x.toString(2).padStart(w,'0');
+const hx=x=>x.toString(16).toUpperCase();
+const grp=s=>{const pad=(4-s.length%4)%4;const t=' '.repeat(pad)+s;return t.replace(/(.{4})(?=.)/g,'$1 ').trim();};
+const fmt=n=>Number(n).toLocaleString('en-GB',{maximumFractionDigits:6});
+const pw=(b,k)=>Math.pow(b,k);
+const sup=k=>String(k).split('').map(c=>'⁰¹²³⁴⁵⁶⁷⁸⁹'[+c]).join('');
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+const TOPICS=[
+ {id:'lshift',set:'shift',label:'Logical shift'},
+ {id:'ashift',set:'shift',label:'Arithmetic shift'},
+ {id:'range',set:'arith',label:'Smallest / largest values'},
+ {id:'twos',set:'signed',label:"Two's complement"},
+ {id:'signmag',set:'signed',label:'Sign and magnitude'},
+ {id:'binadd',set:'arith',label:'8-bit addition & overflow'},
+ {id:'denbin',set:'base',label:'Denary ↔ Binary'},
+ {id:'denhex',set:'base',label:'Denary ↔ Hex'},
+ {id:'binhex',set:'base',label:'Binary ↔ Hex'},
+ {id:'memdec',set:'mem',label:'KB, MB, GB (×1000)'},
+ {id:'membin',set:'mem',label:'KiB, MiB, GiB (×1024)'},
+ {id:'memmix',set:'mem',label:'MiB → KB, KiB ↔ KB (mixed)'},
+ {id:'gates',set:'logic',label:'Logic gates & circuits'},
+ {id:'statements',set:'logic',label:'Statements → expressions'},
+ {id:'build',set:'logic',label:'Build a circuit + truth table'},
+ {id:'build3',set:'logic',label:'Complex 3-input circuits'},
+ {id:'ttable',set:'logic',label:'Truth tables'},
+ {id:'kmap',set:'logic',label:'K-maps (2–3 variables)'},
+];
+const DIFFN={1:'Easy',2:'Medium',3:'Hard'};
+
+const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const state={topics:[],diff:1,score:store.get('bb.score',{right:0,tried:0,streak:0,best:0}),
+  q:null,qn:0,attempts:0,done:false,counted:false,last:null,inp:{}};
+
+function pv(i,w,signed){const p=w-1-i;return (signed==='sm'&&i===0)?'sign':(signed&&i===0)?'−'+pw(2,p):pw(2,p);}
+function reg(x,{w=8,signed=false,marks={}}={}){
+  const b=bin(x,w);let h='<div class="regwrap"><div class="reg">';
+  for(let i=0;i<w;i++){const cls=[b[i]==='1'?'one':'',marks[i]||''].join(' ');
+    h+=`<div class="cell"><small>${pv(i,w,signed)}</small><b class="${cls}">${b[i]}</b></div>`;}
+  return h+'</div></div>';
+}
+function placeTable(x,w){
+  const b=bin(x,w);let h='<div class="tbl"><table><tr>';
+  for(let i=0;i<w;i++)h+=`<th>${pw(2,w-1-i)}</th>`;
+  h+='</tr><tr>';for(let i=0;i<w;i++)h+=`<td class="${b[i]==='1'?'on':''}">${b[i]}</td>`;
+  return h+'</tr></table></div>';
+}
+function terms(x,w){const b=bin(x,w),t=[];for(let i=0;i<w;i++)if(b[i]==='1')t.push(pw(2,w-1-i));return t;}
+function signedTerms(x,w=8){const b=bin(x,w),t=[];for(let i=0;i<w;i++)if(b[i]==='1')t.push(i===0?-pw(2,w-1):pw(2,w-1-i));return t;}
+const sumStr=t=>t.length?t.map((v,i)=>i===0?String(v).replace('-','−'):(v<0?' − '+(-v):' + '+v)).join(''):'0';
+const sgn=v=>v<0?'−'+(-v):String(v);
+const places=n=>n>1?n+' places':'1 place';
+
+/* ---------- shift: "what happens" multiple choice ---------- */
+const SHIFT_FACT={
+  LL:{name:'logical left',move:n=>`Every bit moves ${places(n)} to the left`,fill:'0s fill the empty places on the right',math:N=>`the value is multiplied by ${N} (as long as no 1s fall off)`},
+  LR:{name:'logical right',move:n=>`Every bit moves ${places(n)} to the right`,fill:'0s fill the empty places on the left',math:N=>`the value is divided by ${N} and any remainder is lost`},
+  AL:{name:'arithmetic left',move:n=>`The sign bit stays put and the other bits move ${places(n)} to the left`,fill:'0s fill the empty places on the right',math:N=>`the value is multiplied by ${N} (as long as it does not overflow)`},
+  AR:{name:'arithmetic right',move:n=>`Every bit moves ${places(n)} to the right`,fill:'copies of the sign bit fill the empty places on the left',math:N=>`the value is divided by ${N}, rounding down`},
+};
+const OPP={LL:'LR',LR:'LL',AL:'AR',AR:'AL'};
+const SAMEDIR={LL:'AL',AL:'LL',LR:'AR',AR:'LR'};
+const WRONGFILL={LL:'1s fill the empty places on the right',LR:'copies of the sign bit fill the empty places on the left',AL:'copies of the sign bit fill the empty places on the right',AR:'0s fill the empty places on the left'};
+const sentence=(move,fill,math)=>`${move}, ${fill}, and ${math}.`;
+function shiftMCQ(kind){
+  const d=state.diff;const n=d===1?rnd(1,2):rnd(1,3);
+  const code=(kind==='logical'?'L':'A')+(Math.random()<.5?'L':'R');
+  const N=pw(2,n),wrongN=n===1?4:n===2?2:6;const f=SHIFT_FACT[code];
+  const correct=sentence(f.move(n),f.fill,f.math(N));
+  const o=SHIFT_FACT[OPP[code]],s=SHIFT_FACT[SAMEDIR[code]];
+  let pool=[sentence(o.move(n),o.fill,o.math(N)),sentence(f.move(n),f.fill,f.math(wrongN)),sentence(f.move(n),WRONGFILL[code],f.math(N)),sentence(s.move(n),s.fill,s.math(N))];
+  pool=[...new Set(pool.filter(p=>p!==correct))].slice(0,3);
+  const options=shuffle([correct,...pool]);
+  // worked example
+  let x,r,signed=code[0]==='A',marks={};
+  if(code==='LL'){x=rnd(1,255>>n);r=(x<<n)&255;}
+  else if(code==='LR'){x=rnd(N,255);r=x>>n;}
+  else if(code==='AL'){const v=rnd(-(128>>n),-1);x=v&255;r=(v*N)&255;}
+  else {const v=rnd(-128,-2);x=v&255;r=(v>>n)&255;}
+  if(signed)marks[0]='sign';
+  for(let k=0;k<n;k++)marks[code[1]==='L'?7-k:(signed?1+k:k)]='fill';
+  const val=y=>signed?sgn(signedTerms(y).reduce((a,b)=>a+b,0)):y;
+  const steps=`<ol>
+   <li><p>${correct}</p></li>
+   <li><p>Example, before the ${f.name} shift of ${places(n)}: denary ${val(x)}</p>${reg(x,{signed,marks:signed?{0:'sign'}:{}})}</li>
+   <li><p>After: denary ${val(r)}${code[1]==='L'?` (${val(x)} × ${N})`:` (${val(x)} ÷ ${N}${code==='AR'?', rounded down':', remainder dropped'})`}</p>${reg(r,{signed,marks})}
+   <div class="legend">${signed?'<span><i class="ls"></i>sign bit</span>':''}<span><i class="lf"></i>filled places</span></div></li></ol>`;
+  return {topic:kind==='logical'?'Logical shift':'Arithmetic shift',kind:'mcq',options,ans:options.indexOf(correct),
+    ansText:correct,steps,
+    body:`<p>What happens if we do a <b>${f.name} shift by ${places(n)}</b> on an 8-bit register${signed?' holding a two\'s complement number':''}?</p>`,
+    hint:`Think about three things: which way the bits move, what fills the empty places, and what happens to the value (each place is a factor of 2, so ${places(n)} is a factor of ${N}).`};
+}
+
+/* ---------- generators ---------- */
+const GEN={
+lshift(){
+  if(Math.random()<.3)return shiftMCQ('logical');
+  const d=state.diff,n=d===1?1:rnd(1,d),left=Math.random()<.5;
+  const x=rnd(1,255);const r=left?(x<<n)&255:x>>n;
+  const xb=bin(x,8),lost=left?xb.slice(0,n):xb.slice(8-n);
+  const marks={};for(let k=0;k<n;k++)marks[left?7-k:k]='fill';
+  const dir=left?'left':'right';
+  let effect;
+  if(left)effect=(x<<n)>255?`A 1 fell off the end, so the result is <b>not</b> ${x} × ${pw(2,n)}. The value overflowed: ${x} became ${r}.`
+    :`No 1s were lost, so the value was multiplied by 2${sup(n)} = ${pw(2,n)}: ${x} × ${pw(2,n)} = ${r}.`;
+  else effect=`A logical right shift divides by 2${sup(n)} = ${pw(2,n)} and drops the remainder: ${x} ÷ ${pw(2,n)} = ${r}${x%pw(2,n)?' remainder '+(x%pw(2,n))+' (lost)':''}.`;
+  const steps=`<ol>
+   <li><p>Start with the register: <code>${grp(xb)}</code>. In denary: ${sumStr(terms(x,8))} = ${x}.</p></li>
+   <li><p>Move every bit ${places(n)} to the ${dir}. The bit${n>1?'s':''} pushed off the ${dir} end ${n>1?'are':'is'} lost: <span class="lost">${lost}</span></p></li>
+   <li><p>Fill the empty place${n>1?'s':''} on the ${left?'right':'left'} with 0.</p>${reg(r,{marks})}
+   <div class="legend"><span><i class="lf"></i>filled with 0</span></div></li>
+   <li><p>Convert the result to denary: ${sumStr(terms(r,8))} = <b>${r}</b></p></li>
+   <li><p>${effect}</p></li></ol>`;
+  return {topic:'Logical shift',kind:'shift',signed:false,start:x,ans:r,den:r,ansText:`${grp(bin(r,8))} = ${r} in denary`,steps,
+    body:`<p>Perform a <b>logical ${dir} shift</b> of <b>${places(n)}</b> on this 8-bit register. Then convert the result to denary.</p>${reg(x)}<p class="arrowline">${left?'◀ ':''}shift ${dir} ${places(n)}${left?'':' ▶'}</p>`,
+    hint:left?'Bits move towards the left. Whatever falls off the left end is lost, and 0s come in on the right.':'Bits move towards the right. Whatever falls off the right end is lost, and 0s come in on the left.'};
+},
+ashift(){
+  if(Math.random()<.3)return shiftMCQ('arithmetic');
+  const d=state.diff,n=d===1?1:rnd(1,d),right=Math.random()<.55;let v;
+  if(right)v=Math.random()<.6?rnd(-128,-1):rnd(1,127);
+  else{const lo=-(128>>n),hi=127>>n;v=Math.random()<.6?rnd(lo,-1):rnd(1,Math.max(1,hi));}
+  const x=v&255,rv=right?(v>>n):v*pw(2,n),r=rv&255;const s=x>>7;
+  const marks={0:'sign'};for(let k=0;k<n;k++)marks[right?1+k:7-k]='fill';
+  const xb=bin(x,8),lost=right?xb.slice(8-n):xb.slice(1,1+n);
+  const st=signedTerms(x),rt=signedTerms(r);
+  let steps=`<ol><li><p>The sign bit (leftmost, worth −128) is <b>${s}</b>, so the number is ${s?'negative':'positive'}. Its value: ${sumStr(st)} = <b>${sgn(v)}</b>.</p></li>`;
+  if(right)steps+=`<li><p>Move every bit ${places(n)} to the right. The bit${n>1?'s':''} falling off the right end ${n>1?'are':'is'} lost: <span class="lost">${lost}</span></p></li>
+    <li><p>Fill the empty place${n>1?'s':''} on the left with <b>copies of the sign bit (${s})</b>. This keeps the number ${s?'negative':'positive'}.</p>${reg(r,{signed:true,marks})}</li>
+    <li><p>Convert the result to denary: ${sumStr(rt)} = <b>${sgn(rv)}</b></p></li>
+    <li><p>Check: ${sgn(v)} ÷ ${pw(2,n)} = ${(v/pw(2,n)).toLocaleString('en-GB',{maximumFractionDigits:4}).replace('-','−')}, rounded down = ${sgn(rv)}.</p></li>`;
+  else steps+=`<li><p>Keep the sign bit in place. Move the other bits ${places(n)} to the left. The bit${n>1?'s':''} lost after the sign bit: <span class="lost">${lost}</span> (the same as the sign bit, so there is no overflow).</p></li>
+    <li><p>Fill the empty place${n>1?'s':''} on the right with 0.</p>${reg(r,{signed:true,marks})}</li>
+    <li><p>Convert the result to denary: ${sumStr(rt)} = <b>${sgn(rv)}</b></p></li>
+    <li><p>Check: ${sgn(v)} × ${pw(2,n)} = ${sgn(rv)}.</p></li>`;
+  steps+=`</ol><div class="legend"><span><i class="ls"></i>sign bit</span><span><i class="lf"></i>filled ${right?'with the sign bit':'with 0'}</span></div>`;
+  return {topic:'Arithmetic shift',kind:'shift',signed:true,start:x,ans:r,den:rv,ansText:`${grp(bin(r,8))} = ${sgn(rv)} in denary`,steps,
+    body:`<p>This 8-bit register holds a <b>two's complement</b> integer. Perform an <b>arithmetic ${right?'right':'left'} shift</b> of <b>${places(n)}</b>. Then give the denary value of the result.</p>${reg(x,{signed:true,marks:{0:'sign'}})}<p class="arrowline">${right?'':'◀ '}shift ${right?'right':'left'} ${places(n)}${right?' ▶':''}</p>`,
+    hint:right?'An arithmetic right shift copies the sign bit into the gaps on the left. Each place divides by 2, rounding down.':'An arithmetic left shift keeps the sign bit and fills the right with 0s. Each place multiplies by 2.'};
+},
+denbin(){
+  const d=state.diff,W=[8,12,16][d-1];const x=d===1?rnd(3,255):d===2?rnd(256,4095):rnd(4096,65535);
+  const t=terms(x,W);
+  if(Math.random()<.5){
+    let rem=x,lines=[];for(const v of t){lines.push(`${fmt(rem)} − ${fmt(v)} = ${fmt(rem-v)}`);rem-=v;}
+    const steps=`<ol><li><p>Write the place values for ${W} bits, largest on the left.</p></li>
+     <li><p>Take the largest place value that fits, subtract it, and repeat with what is left:</p><p class="mono" style="font-size:.85rem">${lines.join('<br>')}</p></li>
+     <li><p>Put a 1 under each place value you used and 0 everywhere else:</p>${placeTable(x,W)}</li>
+     <li><p>${fmt(x)} = ${t.map(fmt).join(' + ')}</p><span class="final">${grp(bin(x,W))}</span></li></ol>`;
+    return {topic:'Denary → Binary',body:`<p>Convert this denary number to binary.</p><p class="big">${fmt(x)}</p>`,kind:'bin',ans:x,ansText:grp(bin(x,W)),steps,
+      hint:`Place values double from the right: 1, 2, 4, 8, 16, 32, 64, 128${W>8?', 256, 512, 1024, 2048':''}${W>12?', 4096 …':''}. Start from the largest one that fits.`};
+  }
+  const steps=`<ol><li><p>Write each bit under its place value:</p>${placeTable(x,W)}</li>
+   <li><p>Add the place values that have a 1: ${t.map(fmt).join(' + ')}</p></li><li><span class="final">${fmt(x)}</span></li></ol>`;
+  return {topic:'Binary → Denary',body:`<p>Convert this binary number to denary.</p><p class="big">${grp(bin(x,W))}</p>`,kind:'den',ans:x,ansText:fmt(x),steps,
+    hint:'The rightmost bit is worth 1, the next 2, then 4, 8, 16 … Add the values where there is a 1.'};
+},
+denhex(){
+  const d=state.diff;const x=d===1?rnd(16,255):d===2?rnd(256,4095):rnd(4096,65535);const h=hx(x);
+  if(Math.random()<.5){
+    let q=x,rows='';while(q>0){const r=q%16;rows+=`<tr><td>${fmt(q)} ÷ 16</td><td>${Math.floor(q/16)}</td><td class="on">${r}${r>9?' → '+hx(r):''}</td></tr>`;q=Math.floor(q/16);}
+    const steps=`<ol><li><p>Divide by 16 repeatedly and keep each remainder. Remainders 10 to 15 become A to F.</p><div class="tbl"><table><tr><th>Division</th><th>Quotient</th><th>Remainder</th></tr>${rows}</table></div></li>
+     <li><p>Read the remainders from the bottom up.</p><span class="final">${h}</span></li>
+     <li><p class="note">Check: ${h.split('').map((c,i)=>`${c}×16${sup(h.length-1-i)}`).join(' + ')} = ${fmt(x)}</p></li></ol>`;
+    return {topic:'Denary → Hex',body:`<p>Convert this denary number to hexadecimal.</p><p class="big">${fmt(x)}</p>`,kind:'hex',ans:x,ansText:h,steps,
+      hint:'Divide by 16 and note the remainder. Keep dividing the quotient. Remainders 10–15 are A–F.'};
+  }
+  const parts=h.split('').map((c,i)=>({c,v:parseInt(c,16),p:pw(16,h.length-1-i)}));
+  const steps=`<ol><li><p>Each hex digit has a place value that is a power of 16:</p><div class="tbl"><table><tr>${parts.map(o=>`<th>${fmt(o.p)}</th>`).join('')}</tr><tr>${parts.map(o=>`<td class="on">${o.c}${o.v>9?' = '+o.v:''}</td>`).join('')}</tr></table></div></li>
+   <li><p>Multiply and add: ${parts.map(o=>`${o.v} × ${fmt(o.p)}`).join(' + ')} = ${parts.map(o=>fmt(o.v*o.p)).join(' + ')}</p></li><li><span class="final">${fmt(x)}</span></li></ol>`;
+  return {topic:'Hex → Denary',body:`<p>Convert this hexadecimal number to denary.</p><p class="big">${h}</p>`,kind:'den',ans:x,ansText:fmt(x),steps,
+    hint:'Place values from the right are 1, 16, 256, 4096. A=10, B=11, C=12, D=13, E=14, F=15.'};
+},
+binhex(){
+  const d=state.diff,W=[8,12,16][d-1];const x=d===1?rnd(1,255):d===2?rnd(256,4095):rnd(4096,65535);
+  const b=bin(x,W),h=hx(x).padStart(W/4,'0');const nibs=b.match(/.{4}/g);
+  const tbl=`<div class="tbl"><table><tr><th>Nibble</th>${nibs.map(n=>`<td>${n}</td>`).join('')}</tr><tr><th>8 4 2 1 sum</th>${nibs.map(n=>`<td>${parseInt(n,2)}</td>`).join('')}</tr><tr><th>Hex</th>${nibs.map(n=>`<td class="on">${hx(parseInt(n,2))}</td>`).join('')}</tr></table></div>`;
+  if(Math.random()<.5){
+    const steps=`<ol><li><p>Split the binary into groups of 4 bits (nibbles), starting from the right.</p></li>
+      <li><p>Convert each nibble using place values 8, 4, 2, 1, then write it as one hex digit.</p>${tbl}</li>
+      <li><span class="final">${h}</span> <span class="note">(leading zeros are optional)</span></li></ol>`;
+    return {topic:'Binary → Hex',body:`<p>Convert this binary number to hexadecimal.</p><p class="big">${grp(b)}</p>`,kind:'hex',ans:x,ansText:h,steps,
+      hint:'Group the bits in fours from the right. Each group of 4 is exactly one hex digit.'};
+  }
+  const steps=`<ol><li><p>Turn each hex digit into its 4-bit pattern (8 4 2 1).</p>${tbl}</li><li><p>Join the nibbles together.</p><span class="final">${grp(b)}</span></li></ol>`;
+  return {topic:'Hex → Binary',body:`<p>Convert this hexadecimal number to binary.</p><p class="big">${h}</p>`,kind:'bin',ans:x,ansText:grp(b),steps,
+    hint:'Each hex digit becomes exactly 4 bits. For example, A = 1010 and 7 = 0111.'};
+},
+memdec(){return memFamily(1000,['bytes','KB','MB','GB','TB'],'KB, MB, GB (×1000)');},
+membin(){return memFamily(1024,['bytes','KiB','MiB','GiB','TiB'],'KiB, MiB, GiB (×1024)');},
+memmix(){
+  const d=state.diff;
+  const opts=[()=>[rnd(1,d===1?8:64),'MiB','KB'],()=>[rnd(1,d===1?20:200),'KiB','KB'],()=>[128*rnd(1,d===1?8:40),'KB','KiB']];
+  if(d>=2)opts.push(()=>[rnd(1,32),'MB','KiB'],()=>[rnd(2,40)*1000,'bytes','KiB'],()=>[rnd(1,8),'GiB','MB']);
+  if(d>=3)opts.push(()=>[rnd(1,16),'MiB','MB'],()=>[rnd(1,50)*1000,'KB','MiB'],()=>[rnd(1,4),'GiB','KB']);
+  const [v,from,to]=pick(opts)();
+  return memQuestion(v,from,to,'Mixed units');
+}};
+
+const F={bits:1/8,bytes:1,KB:1e3,MB:1e6,GB:1e9,TB:1e12,KiB:1024,MiB:pw(1024,2),GiB:pw(1024,3),TiB:pw(1024,4)};
+const NAMES={KB:'kilobyte',MB:'megabyte',GB:'gigabyte',TB:'terabyte',KiB:'kibibyte',MiB:'mebibyte',GiB:'gibibyte',TiB:'tebibyte'};
+function clean(n){return Math.abs(n)>1e6?Math.round(n*1e3)/1e3:Math.round(n*1e9)/1e9;}
+function memFamily(base,U,label){
+  const d=state.diff;
+  if(Math.random()<.25){
+    if(Math.random()<.5){const i=rnd(0,Math.min(2,d));return memQuestion(rnd(1,d===1?12:64),U[i],'bits',label);}
+    return memQuestion(rnd(2,d===1?64:5000)*8,'bits','bytes',label);
+  }
+  let i,j;do{i=rnd(0,4);j=rnd(0,4);}while(i===j||Math.abs(i-j)>d);
+  let v;
+  if(i>j)v=d===3&&Math.random()<.4?rnd(3,99)/2:rnd(1,d===1?20:500);
+  else{const a=d===3&&Math.random()<.4?rnd(3,49)/2:rnd(1,d===1?20:250);v=clean(a*pw(base,j-i));}
+  return memQuestion(v,U[i],U[j],label);
+}
+function memQuestion(v,from,to,label){
+  const ans=clean(v*F[from]/F[to]);
+  const fam=u=>u==='bytes'||u==='bits'?0:(/i/.test(u)?1024:1000);
+  const LAD={1000:['bytes','KB','MB','GB','TB'],1024:['bytes','KiB','MiB','GiB','TiB']};
+  const ff=fam(from),ft=fam(to);let steps='<ol>';
+  if(from==='bits'||to==='bits'){
+    if(from==='bits')steps+=`<li><p>8 bits = 1 byte, so divide by 8.</p></li><li><p>${fmt(v)} ÷ 8 = ${fmt(ans)} bytes</p></li>`;
+    else{const bytes=clean(v*F[from]);
+      if(from!=='bytes')steps+=`<li><p>Convert to bytes first. 1 ${from} = ${fmt(F[from])} bytes, so ${fmt(v)} × ${fmt(F[from])} = ${fmt(bytes)} bytes.</p></li>`;
+      steps+=`<li><p>Each byte is 8 bits: ${fmt(bytes)} × 8 = ${fmt(ans)} bits.</p></li>`;}
+  } else if(ff===ft||ff===0||ft===0){
+    const base=ff||ft,L=LAD[base];const a=L.indexOf(from),b=L.indexOf(to),k=Math.abs(a-b),m=pw(base,k);
+    steps+=`<li><p>Each step on the ladder ${L.join(' → ')} is × ${fmt(base)}.</p></li>
+      <li><p>${from} → ${to} is ${k} step${k>1?'s':''} ${a>b?'down to a smaller unit, so multiply':'up to a bigger unit, so divide'} by ${fmt(base)}${k>1?sup(k)+' = '+fmt(m):''}.</p></li>
+      <li><p>${fmt(v)} ${a>b?'×':'÷'} ${fmt(m)} = ${fmt(ans)}</p></li>`;
+  } else {
+    const bytes=clean(v*F[from]);
+    steps+=`<li><p>${from} counts in ${ff}s and ${to} counts in ${ft}s, so go through bytes.</p></li>
+      <li><p>To bytes: 1 ${from} = ${fmt(F[from])} bytes, so ${fmt(v)} × ${fmt(F[from])} = ${fmt(bytes)} bytes.</p></li>
+      <li><p>To ${to}: 1 ${to} = ${fmt(F[to])} bytes, so ${fmt(bytes)} ÷ ${fmt(F[to])} = ${fmt(ans)} ${to}.</p></li>`;
+  }
+  steps+=`<li><span class="final">${fmt(v)} ${from} = ${fmt(ans)} ${to}</span></li></ol>`;
+  const fname=NAMES[from]?` <span class="note">(${NAMES[from]}s)</span>`:'';
+  const tname=NAMES[to]?` (${NAMES[to]}s)`:'';const dec=!Number.isInteger(ans);
+  return {topic:label,kind:'num',ans,ansText:fmt(ans)+' '+to,steps,
+    body:`<p>Convert this amount of memory to <b>${to}</b>${tname}.</p><p class="big">${fmt(v)} <span class="unit">${from}</span>${fname}</p><p class="note">No calculator needed: you can type the calculation itself, for example 4 × 1024 × 1024 ÷ 1000.${dec?' If you work it out, give it to 3 decimal places.':''}</p>`,
+    hint:'Decimal units (KB, MB, GB) step by 1000. Binary units (KiB, MiB, GiB) step by 1024. Going to a smaller unit, multiply; to a bigger unit, divide. Mixing the two? Go through bytes. 1 byte = 8 bits.'};
+}
+
+
+/* ---------- negative numbers: two's complement and sign & magnitude ---------- */
+const toPat=(v,w)=>((v%pw(2,w))+pw(2,w))%pw(2,w);
+const smPat=(v,w)=>(v<0?pw(2,w-1):0)+Math.abs(v);
+const fmtS=v=>sgn(v).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+function addOneHTML(flip,w){
+  const fb=bin(flip,w),cin=Array(w).fill(0);let carry=0;const res=[];
+  for(let i=w-1;i>=0;i--){const tot=+fb[i]+(i===w-1?1:0)+carry;cin[i]=carry;res[i]=tot&1;carry=tot>>1;}
+  const row=a=>a.map(c=>`<td>${c}</td>`).join('');
+  return `<div class="tbl"><table><tr><th>carry</th>${cin.map(c=>`<td>${c?'<sup>1</sup>':''}</td>`).join('')}</tr>
+    <tr><th>flipped</th>${row(fb.split(''))}</tr><tr><th>+ 1</th>${row(Array.from({length:w},(_,i)=>i===w-1?'1':''))}</tr>
+    <tr><th>=</th>${res.map(c=>`<td class="on">${c}</td>`).join('')}</tr></table></div>`;
+}
+function twosBuildSteps(v,w){
+  const pat=toPat(v,w),mask=pw(2,w)-1;
+  if(v>=0)return `<ol><li><p>${fmtS(v)} is positive, so the sign bit is 0 and the number is written in normal binary.</p>${placeTable(v,w)}</li>
+    <li><span class="final">${grp(bin(pat,w))}</span></li></ol>`;
+  const m=-v,flip=(~m)&mask;
+  return `<ol><li><p>Write the positive value ${fmt(m)} in ${w}-bit binary:</p>${reg(m,{w})}</li>
+    <li><p>Flip all the bits (every 0 becomes 1 and every 1 becomes 0):</p>${reg(flip,{w})}</li>
+    <li><p>Add 1 to the rightmost bit, carrying to the left where needed (1 + 1 = 10, write 0 and carry 1):</p>${addOneHTML(flip,w)}</li>
+    <li><p>The result, with sign bit 1 because the number is negative:</p>${reg(pat,{w,signed:true,marks:{0:'sign'}})}</li>
+    <li><p>Check with place values: ${sumStr(signedTerms(pat,w))} = ${fmtS(v)}</p><span class="final">${grp(bin(pat,w))}</span></li></ol>`;
+}
+function twosReadSteps(pat,w){
+  const v=pat>=pw(2,w-1)?pat-pw(2,w):pat,s=pat>>(w-1);
+  if(!s)return `<ol><li><p>The sign bit is 0, so the number is positive. Add the place values of the 1s:</p>${placeTable(pat,w)}</li><li><p>${sumStr(terms(pat,w))}</p><span class="final">${fmtS(v)}</span></li></ol>`;
+  const mask=pw(2,w)-1,flip=(~pat)&mask,m=(flip+1)&mask;
+  return `<ol><li><p>The sign bit is 1, so the number is negative.</p>${reg(pat,{w,signed:true,marks:{0:'sign'}})}</li>
+    <li><p>To find its size, flip all the bits:</p>${reg(flip,{w})}</li>
+    <li><p>Add 1 to the rightmost bit:</p>${addOneHTML(flip,w)}</li>
+    <li><p>${grp(bin(m,w))} = ${fmt(m===0?pw(2,w-1):m)}, so the number is ${fmtS(v)}.</p></li>
+    <li><p class="note">Check with place values (sign bit worth −${fmt(pw(2,w-1))}): ${sumStr(signedTerms(pat,w))} = ${fmtS(v)}</p><span class="final">${fmtS(v)}</span></li></ol>`;
+}
+function smBuildSteps(v,w){
+  const pat=smPat(v,w),m=Math.abs(v);
+  return `<ol><li><p>The sign bit (leftmost) is ${v<0?'1 because the number is negative':'0 because the number is positive'}.</p></li>
+    <li><p>Write the size of the number, ${fmt(m)}, in the other ${w-1} bits:</p>${placeTable(m,w-1)}</li>
+    <li><p>Put the sign bit in front:</p>${reg(pat,{w,signed:'sm',marks:{0:'sign'}})}<span class="final">${grp(bin(pat,w))}</span></li></ol>`;
+}
+function smReadSteps(pat,w){
+  const s=pat>>(w-1),m=pat&(pw(2,w-1)-1),v=s?-m:m;
+  return `<ol><li><p>The sign bit is ${s}, so the number is ${s?'negative':'positive'}.</p>${reg(pat,{w,signed:'sm',marks:{0:'sign'}})}</li>
+    <li><p>The other ${w-1} bits give the size: ${sumStr(terms(m,w-1))} = ${fmt(m)}</p></li>
+    <li><span class="final">${fmtS(v)}</span></li></ol>`;
+}
+const SIGNED_FACTS=[
+ {t:'twos',q:"To make a number negative in two's complement, you…",a:'flip all the bits, then add 1 to the rightmost bit',w:['flip only the leftmost bit','flip all the bits, and stop there','add 1 to the leftmost bit, then flip the bits'],e:"Write the positive number in binary, flip all the bits, then add 1 to the rightmost bit. Flipping only the sign bit is how sign and magnitude works."},
+ {t:'twos',q:"In 8-bit two's complement, what is the place value of the leftmost bit?",a:'−128',w:['128','−127','−1'],e:"The leftmost bit is worth −2⁷ = −128. All the other bits keep their normal positive place values."},
+ {t:'twos',q:"What is the range of an 8-bit two's complement integer?",a:'−128 to 127',w:['−127 to 127','0 to 255','−255 to 255'],e:"Smallest: 1000 0000 = −128. Largest: 0111 1111 = 127."},
+ {t:'sm',q:'What is the range of an 8-bit sign and magnitude integer?',a:'−127 to 127',w:['−128 to 127','0 to 255','−128 to 128'],e:'The sign uses 1 bit, so the size uses 7 bits: 0 to 127. That gives −127 to +127.'},
+ {t:'sm',q:'Which representation has two different patterns for zero?',a:'Sign and magnitude',w:["Two's complement",'Unsigned binary','Hexadecimal'],e:'In sign and magnitude, 0000 0000 is +0 and 1000 0000 is −0. Two\'s complement has only one zero.'},
+ {t:'sm',q:'In sign and magnitude, how is −5 different from +5?',a:'Only the leftmost (sign) bit changes',w:['Every bit is flipped','Every bit is flipped and 1 is added','The bits are written in reverse order'],e:'+5 = 0000 0101 and −5 = 1000 0101. Only the sign bit changes.'},
+ {t:'both',q:"Why is two's complement usually used instead of sign and magnitude?",a:'Normal binary addition works for negative numbers, and there is only one zero',w:['It can store larger positive numbers','It does not need a sign bit','It uses fewer bits for negative numbers'],e:"Two's complement numbers can be added with ordinary binary addition, and there is only one pattern for zero. Sign and magnitude needs extra rules for adding and has +0 and −0."},
+];
+function signedMCQ(topic,tag){
+  const f=pick(SIGNED_FACTS.filter(x=>x.t===tag||x.t==='both'));const options=shuffle([f.a,...f.w]);
+  return {topic,kind:'mcq',options,ans:options.indexOf(f.a),ansText:f.a,body:`<p>${f.q}</p>`,
+    steps:`<ol><li><p>${f.e}</p></li><li><span class="final">${f.a}</span></li></ol>`,hint:'Think about what the leftmost bit means in each representation.'};
+}
+Object.assign(GEN,{
+twos(){
+  const T="Two's complement",d=state.diff,w=d===3?pick([8,12]):8,half=pw(2,w-1),r=Math.random();
+  if(r<.15)return signedMCQ(T,'twos');
+  let v=d===1?(Math.random()<.75?-rnd(1,60):rnd(1,60)):(Math.random()<.7?-rnd(1,half):rnd(1,half-1));
+  const pat=toPat(v,w);
+  if(Math.random()<.55)return {topic:T,kind:'bits',w,signed:true,helpers:v<0,ans:pat,ansText:grp(bin(pat,w)),steps:twosBuildSteps(v,w),
+    body:`<p>Write this denary number as a <b>${w}-bit two's complement</b> binary number.</p><p class="big">${fmtS(v)}</p>`,
+    hint:v<0?`Write ${fmt(-v)} in binary first. Then flip all the bits, and add 1 to the rightmost bit. The buttons under the squares can do the flip and the +1 for you once you have typed the positive number in.`:'A positive number is written in normal binary with a 0 sign bit.'};
+  return {topic:T,kind:'den',ans:v,ansText:fmtS(v),steps:twosReadSteps(pat,w),
+    body:`<p>This is a <b>${w}-bit two's complement</b> number. What is it in denary?</p>${reg(pat,{w,signed:true,marks:{0:'sign'}})}`,
+    hint:`If the sign bit is 1, flip all the bits and add 1 to the rightmost bit to find the size, then put a minus sign in front. Or add the place values, with the leftmost bit worth −${fmt(half)}.`};
+},
+signmag(){
+  const T='Sign and magnitude',d=state.diff,w=d===3?pick([8,12]):8,maxM=pw(2,w-1)-1,r=Math.random();
+  if(r<.15)return signedMCQ(T,'sm');
+  if(d>=2&&r<.28){
+    const largest=Math.random()<.5,pat=largest?maxM:pw(2,w-1)+maxM,den=largest?maxM:-maxM,pb=grp(bin(pat,w));
+    return {topic:T,kind:'pair',w,pat,den,ansText:`${pb} = ${fmtS(den)}`,
+      body:`<p>What is the <b>${largest?'largest':'smallest'}</b> number that can be stored in <b>${w}-bit sign and magnitude</b>?</p><p class="note">Give it as ${w}-bit binary and as a denary number.</p>`,
+      steps:`<ol><li><p>One bit is the sign, so ${w-1} bits are left for the size. The biggest size is 2${sup(w-1)} − 1 = ${fmt(maxM)}.</p></li>
+        <li><p>${largest?'Largest: sign bit 0 (positive)':'Smallest: sign bit 1 (negative)'}, and every other bit 1.</p><span class="final">${pb} = ${fmtS(den)}</span></li>
+        <li><p class="note">So ${w}-bit sign and magnitude holds −${fmt(maxM)} to +${fmt(maxM)}.</p></li></ol>`,
+      hint:'The first bit only gives the sign. The size uses the remaining bits, so its largest value is all 1s.'};
+  }
+  let v=d===1?(Math.random()<.7?-rnd(1,60):rnd(1,60)):(Math.random()<.7?-rnd(1,maxM):rnd(1,maxM));
+  if(d===3&&Math.random()<.4){
+    const toTwos=Math.random()<.5;
+    if(toTwos){const sp=smPat(v,w),tp=toPat(v,w);
+      return {topic:'Sign & magnitude → two\'s complement',kind:'bits',w,signed:true,helpers:v<0,ans:tp,ansText:grp(bin(tp,w)),
+        body:`<p>This ${w}-bit number is in <b>sign and magnitude</b>. Write the same number in <b>${w}-bit two's complement</b>.</p>${reg(sp,{w,signed:'sm',marks:{0:'sign'}})}`,
+        steps:`<p><b>First read the sign and magnitude number.</b></p>${smReadSteps(sp,w)}<p><b>Then write ${fmtS(v)} in two's complement.</b></p>${twosBuildSteps(v,w)}`,
+        hint:'Work out the denary value first, then convert that value to two\'s complement.'};}
+    const tp=toPat(v,w),sp=smPat(v,w);
+    return {topic:'Two\'s complement → sign & magnitude',kind:'bits',w,signed:'sm',ans:sp,ansText:grp(bin(sp,w)),
+      body:`<p>This ${w}-bit number is in <b>two's complement</b>. Write the same number in <b>${w}-bit sign and magnitude</b>.</p>${reg(tp,{w,signed:true,marks:{0:'sign'}})}`,
+      steps:`<p><b>First read the two's complement number.</b></p>${twosReadSteps(tp,w)}<p><b>Then write ${fmtS(v)} in sign and magnitude.</b></p>${smBuildSteps(v,w)}`,
+      hint:'Work out the denary value first, then write its sign bit and its size.'};
+  }
+  const pat=smPat(v,w);
+  if(Math.random()<.55)return {topic:T,kind:'bits',w,signed:'sm',ans:pat,ansText:grp(bin(pat,w)),steps:smBuildSteps(v,w),
+    body:`<p>Write this denary number as a <b>${w}-bit sign and magnitude</b> binary number.</p><p class="big">${fmtS(v)}</p>`,
+    hint:`The leftmost bit is the sign: 1 for negative, 0 for positive. The other ${w-1} bits hold the size in normal binary.`};
+  return {topic:T,kind:'den',ans:v,ansText:fmtS(v),steps:smReadSteps(pat,w),
+    body:`<p>This is a <b>${w}-bit sign and magnitude</b> number. What is it in denary?</p>${reg(pat,{w,signed:'sm',marks:{0:'sign'}})}`,
+    hint:'The leftmost bit only tells you the sign. Convert the other bits to denary for the size.'};
+}
+});
+
+/* ---------- Boolean logic engine ---------- */
+const G2=['AND','OR','NAND','NOR','XOR','XNOR'];
+const GATE_DESC={AND:'outputs 1 only when both inputs are 1',OR:'outputs 1 when at least one input is 1',NAND:'outputs 0 only when both inputs are 1',NOR:'outputs 1 only when both inputs are 0',XOR:'outputs 1 when the two inputs are different',XNOR:'outputs 1 when the two inputs are the same',NOT:'flips its input: 0 becomes 1 and 1 becomes 0'};
+function tokenize(src){
+  const s=String(src).replace(/[’`´′]/g,"'");const t=[];let i=0;
+  while(i<s.length){
+    const c=s[i];if(/\s/.test(c)){i++;continue;}
+    const m=s.slice(i).toUpperCase().match(/^(XNOR|XOR|NAND|NOR|AND|OR|NOT)(?![A-Z])/);
+    if(m){t.push({op:m[1]});i+=m[1].length;continue;}
+    if('(['.includes(c)){t.push({op:'('});i++;continue;}
+    if(')]'.includes(c)){t.push({op:')'});i++;continue;}
+    if('.·*&∧×'.includes(c)){t.push({op:'AND'});i++;continue;}
+    if('+|∨'.includes(c)){t.push({op:'OR'});i++;continue;}
+    if('⊕^'.includes(c)){t.push({op:'XOR'});i++;continue;}
+    if('!¬~'.includes(c)){t.push({op:'NOT'});i++;continue;}
+    if(c==="'"){t.push({op:"'"});i++;continue;}
+    if(/[A-Za-z]/.test(c)){t.push({v:c.toUpperCase()});i++;continue;}
+    if(c==='0'||c==='1'){t.push({k:+c});i++;continue;}
+    throw new Error(`“${c}” isn't something I can read. Use letters, AND, OR, NOT, NAND, NOR, XOR, XNOR, brackets, or . + ' ¬ ⊕`);
+  }
+  if(!t.length)throw new Error('Type an expression first.');
+  return t;
+}
+function parseExpr(src){
+  const t=tokenize(src);let p=0;
+  const peek=()=>t[p];const isOp=o=>peek()&&peek().op===o;
+  const startsPrim=k=>k&&(k.v||k.k!=null||k.op==='('||k.op==='NOT');
+  function orL(){let l=xorL();while(peek()&&(peek().op==='OR'||peek().op==='NOR')){const o=t[p++].op;l={op:o,a:l,b:xorL()};}return l;}
+  function xorL(){let l=andL();while(peek()&&(peek().op==='XOR'||peek().op==='XNOR')){const o=t[p++].op;l={op:o,a:l,b:andL()};}return l;}
+  function andL(){let l=notL();for(;;){const k=peek();
+    if(k&&(k.op==='AND'||k.op==='NAND')){p++;l={op:k.op,a:l,b:notL()};}
+    else if(startsPrim(k)){l={op:'AND',a:l,b:notL()};}else break;}return l;}
+  function notL(){if(isOp('NOT')){p++;return {op:'NOT',a:notL()};}return post(prim());}
+  function post(n){while(isOp("'")){p++;n={op:'NOT',a:n};}return n;}
+  function prim(){const k=t[p++];
+    if(!k)throw new Error('The expression stops too early. Is something missing after the last operator?');
+    if(k.v)return {v:k.v};if(k.k!=null)return {k:k.k};
+    if(k.op==='('){const e=orL();if(!isOp(')'))throw new Error('A closing bracket ) is missing.');p++;return e;}
+    if(k.op===')')throw new Error('There is a ) without a matching (.');
+    throw new Error(`“${k.op}” needs something before it.`);}
+  const e=orL();
+  if(p<t.length){const k=t[p];throw new Error(k.op===')'?'There is a ) without a matching (.':`Unexpected “${k.op||k.v}”.`);}
+  return e;
+}
+function evalE(n,env){
+  if(n.v)return env[n.v];if(n.k!=null)return n.k;
+  const a=evalE(n.a,env);if(n.op==='NOT')return 1-a;const b=evalE(n.b,env);
+  switch(n.op){case 'AND':return a&b;case 'OR':return a|b;case 'NAND':return 1-(a&b);case 'NOR':return 1-(a|b);case 'XOR':return a^b;case 'XNOR':return 1-(a^b);}
+}
+function varsOf(n,s=new Set()){if(n.v)s.add(n.v);if(n.a)varsOf(n.a,s);if(n.b)varsOf(n.b,s);return [...s].sort();}
+function countLits(n){if(n.v)return 1;if(n.k!=null)return 0;return countLits(n.a)+(n.b?countLits(n.b):0);}
+function gateCount(n){if(!n.op)return 0;return 1+gateCount(n.a)+(n.b?gateCount(n.b):0);}
+function words(n){
+  if(n.v)return n.v;if(n.k!=null)return String(n.k);
+  if(n.op==='NOT'){const s=words(n.a);return 'NOT '+(n.a.op&&n.a.op!=='NOT'?'('+s+')':s);}
+  const wrap=c=>{const s=words(c);return (c.op&&c.op!=='NOT'&&!(c.op===n.op&&['AND','OR','XOR'].includes(n.op)))?'('+s+')':s;};
+  return wrap(n.a)+' '+n.op+' '+wrap(n.b);
+}
+function postNodes(e){const out=[],seen=new Set();(function walk(n){if(!n.op)return;walk(n.a);if(n.b)walk(n.b);const w=words(n);if(!seen.has(w)){seen.add(w);out.push(n);}})(e);return out;}
+function envOf(i,V){const env={},n=V.length;V.forEach((v,j)=>env[v]=(i>>(n-1-j))&1);return env;}
+function truthOf(e,V){return Array.from({length:1<<V.length},(_,i)=>evalE(e,envOf(i,V)));}
+function hasDup(n){if(!n.op)return false;if(n.b&&words(n.a)===words(n.b))return true;return hasDup(n.a)||(n.b?hasDup(n.b):false);}
+function randExpr(V,k){
+  for(let t=0;t<600;t++){
+    const g=kk=>{if(kk===0)return {v:pick(V)};
+      if(Math.random()<.25){const a=g(kk-1);return a.op==='NOT'?a:{op:'NOT',a};}
+      const kl=rnd(0,kk-1);return {op:pick(G2),a:g(kl),b:g(kk-1-kl)};};
+    const e=g(k);
+    if(gateCount(e)!==k||varsOf(e).length!==V.length||hasDup(e))continue;
+    const tt=truthOf(e,V);if(tt.every(x=>x===tt[0]))continue;
+    return e;
+  }
+  return {op:'AND',a:{v:V[0]},b:{v:V[1]}};
+}
+
+/* ---------- tables, K-maps, minimal SOP ---------- */
+function ttHTML(e,V,{mid=true,label='Q'}={}){
+  const midN=mid?postNodes(e).filter(nd=>nd!==e&&words(nd)!==words(e)):[];
+  let h='<div class="tbl"><table class="tt"><tr>'+V.map(v=>`<th>${v}</th>`).join('')+midN.map(nd=>`<th class="mid">${esc(words(nd))}</th>`).join('')+`<th class="out">${label}</th></tr>`;
+  for(let i=0;i<1<<V.length;i++){const env=envOf(i,V),q=evalE(e,env);
+    h+='<tr>'+V.map(v=>`<td>${env[v]}</td>`).join('')+midN.map(nd=>`<td>${evalE(nd,env)}</td>`).join('')+`<td class="out ${q?'on':''}">${q}</td></tr>`;}
+  return h+'</table></div>';
+}
+function valsTableHTML(V,vals,label='F'){
+  let h='<div class="tbl"><table class="tt"><tr>'+V.map(v=>`<th>${v}</th>`).join('')+`<th class="out">${label}</th></tr>`;
+  vals.forEach((q,i)=>{const env=envOf(i,V);h+='<tr>'+V.map(v=>`<td>${env[v]}</td>`).join('')+`<td class="out ${q?'on':''}">${q}</td></tr>`;});
+  return h+'</table></div>';
+}
+function cubeMins(c,n){let ms=[0];for(let j=0;j<n;j++){const w=1<<(n-1-j),nx=[];for(const m of ms){if(c[j]===2)nx.push(m,m|w);else nx.push(c[j]?m|w:m);}ms=nx;}return ms.sort((a,b)=>a-b);}
+function minSOP(n,onArr){
+  const on=new Set(onArr);
+  if(!on.size)return {groups:[],lits:0,zero:true};
+  if(on.size===1<<n){const c=Array(n).fill(2);return {groups:[{c,ms:cubeMins(c,n),lits:0}],lits:0,one:true};}
+  const imps=[];
+  for(let code=0;code<pw(3,n);code++){const c=[];let t=code;for(let j=n-1;j>=0;j--){c[j]=t%3;t=Math.floor(t/3);}
+    const ms=cubeMins(c,n);if(ms.every(m=>on.has(m)))imps.push({c,ms,lits:c.filter(x=>x!==2).length});}
+  const primes=imps.filter(a=>!imps.some(b=>b.ms.length>a.ms.length&&a.ms.every(m=>b.ms.includes(m))));
+  let best=null;
+  if(primes.length<=18){
+    for(let mask=1;mask<(1<<primes.length);mask++){const sel=primes.filter((_,i)=>mask>>i&1);
+      const cnt=sel.length;if(best&&cnt>best.groups.length)continue;
+      const cov=new Set();sel.forEach(s=>s.ms.forEach(m=>cov.add(m)));if(cov.size!==on.size)continue;
+      const lits=sel.reduce((a,s)=>a+s.lits,0);
+      if(!best||cnt<best.groups.length||(cnt===best.groups.length&&lits<best.lits))best={groups:sel,lits};}
+  } else {
+    const left=new Set(on),sel=[];while(left.size){let b=null,bc=-1;for(const p of primes){const c=p.ms.filter(m=>left.has(m)).length;if(c>bc){bc=c;b=p;}}sel.push(b);b.ms.forEach(m=>left.delete(m));}
+    best={groups:sel,lits:sel.reduce((a,s)=>a+s.lits,0)};
+  }
+  best.groups=best.groups.slice().sort((a,b)=>a.ms[0]-b.ms[0]);
+  return best;
+}
+const cubeHTML=(c,V)=>c.map((x,j)=>x===2?'':x?V[j]:`<span class="ov">${V[j]}</span>`).join('')||'1';
+const cubePlain=(c,V)=>c.map((x,j)=>x===2?'':x?V[j]:V[j]+"'").join('')||'1';
+const sopHTML=(s,V)=>s.zero?'0':s.groups.map(g=>cubeHTML(g.c,V)).join(' + ');
+const sopPlain=(s,V)=>s.zero?'0':s.groups.map(g=>cubePlain(g.c,V)).join(' + ');
+function groupTags(s){const tags={};s.groups.forEach((g,gi)=>g.ms.forEach(m=>(tags[m]=tags[m]||[]).push(gi)));return tags;}
+function kmapHTML(n,vals,{input=false,tags=null,V=['A','B','C']}={}){
+  const cols=n===2?[0,1]:[0,1,3,2],colLab=n===2?['0','1']:['00','01','11','10'];
+  let h=`<div class="tbl"><table class="kmap"><tr><th class="corner">${V[0]} &#92; ${V.slice(1,n).join('')}</th>${colLab.map(l=>`<th>${l}</th>`).join('')}</tr>`;
+  for(const a of [0,1]){h+=`<tr><th>${a}</th>`;
+    for(const code of cols){const m=n===2?a*2+code:a*4+code;
+      if(input)h+=`<td><button type="button" class="tap blank" data-i="${m}" id="tap${m}" aria-label="Cell m${m}">·</button><small class="mi">m${m}</small></td>`;
+      else{const v=vals[m];const tg=tags&&tags[m]?`<span class="tags">${tags[m].map(g=>`<i class="gt g${g%4}">${g+1}</i>`).join('')}</span>`:'';
+        h+=`<td class="${v?'on':''}"><span class="kv">${v}</span>${tg}<small class="mi">m${m}</small></td>`;}}
+    h+='</tr>';}
+  return h+'</table></div>';
+}
+function gateTT(g){
+  let h='<div class="tbl"><table class="tt"><tr><th>A</th><th>B</th><th class="out">Q</th></tr>';
+  for(let i=0;i<4;i++){const env=envOf(i,['A','B']);const q=evalE({op:g,a:{v:'A'},b:{v:'B'}},env);h+=`<tr><td>${env.A}</td><td>${env.B}</td><td class="out ${q?'on':''}">${q}</td></tr>`;}
+  return h+'</table></div>';
+}
+
+/* ---------- new generators ---------- */
+Object.assign(GEN,{
+range(){
+  const d=state.diff,r=Math.random();
+  if(d>=2&&r<.2){
+    const x=d===2?rnd(5,600):rnd(600,60000),b=x.toString(2).length;
+    const steps=`<ol><li><p>Find the powers of 2 either side: 2${sup(b-1)} = ${fmt(pw(2,b-1))} ≤ ${fmt(x)} &lt; 2${sup(b)} = ${fmt(pw(2,b))}.</p></li>
+      <li><p>With ${b-1} bits the largest value is ${fmt(pw(2,b-1)-1)}, which is too small. With ${b} bits the largest value is ${fmt(pw(2,b)-1)}, which is enough.</p></li>
+      <li><p>Check: ${fmt(x)} in binary is ${grp(bin(x,b))}, which uses ${b} bits.</p><span class="final">${b} bits</span></li></ol>`;
+    return {topic:'Bit ranges',kind:'den',ans:b,ansText:b+' bits',steps,
+      body:`<p>What is the <b>minimum number of bits</b> needed to store this denary number as an unsigned binary integer?</p><p class="big">${fmt(x)}</p>`,
+      hint:'n bits can hold values from 0 up to 2ⁿ − 1. Keep doubling until you pass the number: 2, 4, 8, 16, 32 …'};
+  }
+  if(r<.38){
+    const n=rnd(d===1?2:4,d===1?8:d===2?12:16),N=pw(2,n);
+    const steps=`<ol><li><p>Each bit has 2 possible values, so ${n} bits give 2 × 2 × … × 2 (${n} times) = 2${sup(n)} patterns.</p></li>
+      <li><p>2${sup(n)} = ${fmt(N)}. As unsigned numbers these are 0 to ${fmt(N-1)}.</p><span class="final">${fmt(N)}</span></li></ol>`;
+    return {topic:'Bit ranges',kind:'den',allowExpr:true,ans:N,ansText:fmt(N),steps,body:`<p>How many <b>different values</b> can be represented with <b>${n} bits</b>?</p>`,
+      hint:'Each extra bit doubles the number of patterns: 1 bit gives 2, 2 bits give 4, 3 bits give 8 …'};
+  }
+  const n=d===1?rnd(3,8):d===2?rnd(4,10):rnd(5,16);
+  const twos=d>=2&&Math.random()<(d===2?.45:.6),largest=Math.random()<.5;
+  let pat,den;
+  if(!twos){pat=largest?pw(2,n)-1:0;den=pat;}
+  else{pat=largest?pw(2,n-1)-1:pw(2,n-1);den=largest?pw(2,n-1)-1:-pw(2,n-1);}
+  const pb=grp(bin(pat,n));let steps='<ol>';
+  if(!twos){
+    steps+=largest?`<li><p>The largest unsigned value has every bit set to 1: ${pb}</p></li><li><p>Its value is 2${sup(n)} − 1 = ${fmt(pw(2,n))} − 1 = ${fmt(den)}.</p></li>`
+      :`<li><p>The smallest unsigned value has every bit set to 0: ${pb}</p></li><li><p>Its value is 0.</p></li>`;
+    steps+=`<li><p>So ${n} unsigned bits can hold 0 to ${fmt(pw(2,n)-1)}.</p><span class="final">${pb} = ${fmt(den)}</span></li>`;
+  } else {
+    steps+=`<li><p>In two's complement the leftmost bit is the sign bit and is worth −2${sup(n-1)} = −${fmt(pw(2,n-1))}.</p></li>`;
+    steps+=largest?`<li><p>For the largest value, make the sign bit 0 (positive) and every other bit 1: ${pb}</p></li><li><p>Value: 2${sup(n-1)} − 1 = ${fmt(den)}.</p></li>`
+      :`<li><p>For the smallest value, make the sign bit 1 (the −${fmt(pw(2,n-1))}) and every other bit 0, so nothing is added back: ${pb}</p></li><li><p>Value: −2${sup(n-1)} = ${sgn(den).replace(/\B(?=(\d{3})+(?!\d))/g,',')}.</p></li>`;
+    steps+=`<li><p>So ${n}-bit two's complement holds −${fmt(pw(2,n-1))} to ${fmt(pw(2,n-1)-1)}.</p><span class="final">${pb} = ${sgn(den).replace(/\B(?=(\d{3})+(?!\d))/g,',')}</span></li>`;
+  }
+  steps+='</ol>';
+  return {topic:'Bit ranges',kind:'pair',w:n,pat,den,ansText:`${pb} = ${sgn(den)}`,steps,
+    body:`<p>What is the <b>${largest?'largest':'smallest'}</b> value that can be stored in <b>${n} bits</b> as ${twos?"a <b>two's complement</b> (signed) integer":'an <b>unsigned</b> integer'}?</p><p class="note">Give it as ${n}-bit binary and as a denary number.</p>`,
+    hint:twos?"In two's complement the leftmost bit is worth −2ⁿ⁻¹. Largest: sign bit 0, the rest 1. Smallest: sign bit 1, the rest 0.":'Unsigned: the smallest is all 0s; the largest is all 1s, which equals 2ⁿ − 1.'};
+},
+binadd(){
+  const d=state.diff,signed=d===3,want=Math.random()<(d===1?.35:.5);
+  let x,y,r,ovf,t=0;
+  do{x=rnd(signed?0:(d===1?16:1),255);y=rnd(signed?0:(d===1?16:1),255);r=(x+y)&255;
+    ovf=signed?((x^r)&(y^r)&128)!==0:x+y>255;t++;}while(ovf!==want&&t<500);
+  const xb=bin(x,8),yb=bin(y,8),rb=bin(r,8);const cin=Array(8).fill(0);let carry=0;const lines=[];
+  for(let i=7;i>=0;i--){const a=+xb[i],b=+yb[i];cin[i]=carry;const tot=a+b+carry;
+    lines.unshift(`<tr><td>${pv(i,8,signed)}</td><td>${a} + ${b}${carry?' + 1':''} = ${tot}</td><td class="on">${tot&1}</td><td>${tot>>1?'1':''}</td></tr>`);carry=tot>>1;}
+  const head=Array.from({length:8},(_,i)=>`<th>${pv(i,8,signed)}</th>`).join('');
+  const rowOf=(s,cls='')=>s.split('').map(c=>`<td class="${cls}">${c}</td>`).join('');
+  const carryTbl=`<div class="tbl"><table><tr><th></th><th>carry out</th>${head}</tr>
+    <tr><th>carry</th><td></td>${cin.map(c=>`<td>${c?'<sup>1</sup>':''}</td>`).join('')}</tr>
+    <tr><th>&nbsp;</th><td></td>${rowOf(xb)}</tr><tr><th>+</th><td></td>${rowOf(yb)}</tr>
+    <tr><th>=</th><td class="${carry?'on':''}">${carry?1:''}</td>${rowOf(rb,'on')}</tr></table></div>`;
+  let why;
+  if(!signed){
+    why=ovf?`There is a carry out of the leftmost (128) column. The true total is ${x} + ${y} = ${x+y}, which needs 9 bits, but an 8-bit register can only hold up to 255. The 9th bit is lost and the register shows ${r}. <b>Overflow error.</b>`
+      :`There is no carry out of the leftmost column. ${x} + ${y} = ${x+y}, which fits in 8 bits (0 to 255). <b>No overflow.</b>`;
+  } else {
+    const vx=x>127?x-256:x,vy=y>127?y-256:y,vr=r>127?r-256:r;
+    why=ovf?`Both numbers are ${vx>=0?'positive':'negative'} (sign bit ${x>>7}), but the result has sign bit ${r>>7}, so it reads as ${sgn(vr)}. The true answer ${sgn(vx)} + ${sgn(vy)} = ${sgn(vx+vy)} is outside the 8-bit range −128 to 127. <b>Overflow error.</b>`
+      :`${sgn(vx)} + ${sgn(vy)} = ${sgn(vx+vy)}, which is inside the 8-bit range −128 to 127, and the result reads as ${sgn(vr)}. <b>No overflow.</b>${carry?' The carry out of the last column is ignored in two\'s complement.':''}`;
+    why+=` <span class="note">(Overflow in two's complement happens when two numbers with the same sign give a result with the other sign.)</span>`;
+  }
+  const steps=`<ol><li><p>Add column by column from the right. 0 + 0 = 0, 0 + 1 = 1, 1 + 1 = 10 (write 0, carry 1), 1 + 1 + 1 = 11 (write 1, carry 1).</p>
+    <div class="tbl"><table><tr><th>Column</th><th>Working</th><th>Write</th><th>Carry</th></tr>${lines.join('')}</table></div></li>
+    <li><p>The whole sum with carries:</p>${carryTbl}</li>
+    <li><p>${why}</p><span class="final">${grp(rb)} · ${ovf?'overflow':'no overflow'}</span></li></ol>`;
+  return {topic:'8-bit addition',kind:'add',signed,ans:r,ovf,ansText:`${grp(rb)}, ${ovf?'overflow error':'no overflow'}`,steps,
+    body:`<p>Add these two 8-bit ${signed?"<b>two's complement</b>":'<b>unsigned</b>'} binary numbers. Fill in the 8-bit result and say whether an <b>overflow error</b> happens.</p>
+      <div class="sumgrid"><span class="op"></span>${reg(x,{signed})}<span class="op">+</span>${reg(y,{signed})}</div>`,
+    hint:signed?"Add as normal and ignore any carry out of the last column. Overflow happens if two positives give a negative, or two negatives give a positive.":'Work right to left, carrying 1 whenever a column adds to 2 or 3. A carry out of the leftmost column means the answer is too big for 8 bits.'};
+},
+gates(){
+  const d=state.diff,r=Math.random();
+  if(r<.3){
+    const g=pick(G2),options=shuffle([g,...shuffle(G2.filter(x=>x!==g)).slice(0,3)]),byDesc=Math.random()<.5,tbl=gateTT(g);
+    return {topic:'Logic gates',kind:'mcq',options,ans:options.indexOf(g),ansText:g,
+      body:byDesc?`<p>Which logic gate ${GATE_DESC[g]}?</p>`:`<p>Which logic gate has this truth table?</p>${tbl}`,
+      steps:`<ol><li><p>The ${g} gate ${GATE_DESC[g]}.</p>${tbl}</li><li><span class="final">${g}</span></li></ol>`,
+      hint:'Look at the row where both inputs are 0 and the row where both are 1. Those two rows separate most gates.'};
+  }
+  let e;
+  if(d===1)e=Math.random()<.25?{op:'NOT',a:{v:'A'}}:{op:pick(G2),a:{v:'A'},b:{v:'B'}};
+  else e=randExpr(['A','B','C'],d===2?2:3);
+  const V=varsOf(e),env={};V.forEach(v=>env[v]=rnd(0,1));const out=evalE(e,env);
+  const used=[...new Set(postNodes(e).map(nd=>nd.op))];
+  const rows=postNodes(e).map(nd=>{const val=evalE(nd,env);const work=nd.op==='NOT'?`NOT ${evalE(nd.a,env)}`:`${evalE(nd.a,env)} ${nd.op} ${evalE(nd.b,env)}`;
+    return `<tr><td style="text-align:left">${esc(words(nd))}</td><td>${work}</td><td class="on">${val}</td></tr>`;}).join('');
+  const steps=`<ol><li><p>${used.map(g=>`${g} ${GATE_DESC[g]}.`).join(' ')}</p></li>
+    <li><p>Work from the inside out with ${V.map(v=>`${v} = ${env[v]}`).join(', ')}:</p><div class="tbl"><table><tr><th>Part</th><th>Working</th><th>Result</th></tr>${rows}</table></div></li>
+    <li><span class="final">Q = ${out}</span></li></ol>`;
+  return {topic:'Logic gates',kind:'bit',options:['0','1'],ans:out,ansText:'Q = '+out,steps,
+    body:`<p>Work out the output Q for these inputs.</p><div class="vals">${V.map(v=>`<span>${v} = ${env[v]}</span>`).join('')}</div><p><span class="expr">Q = ${esc(words(e))}</span></p>`,
+    hint:'Start with the innermost brackets and any NOT, write down each result, then combine them.'};
+},
+ttable(){
+  const d=state.diff,V=d===1?['A','B']:['A','B','C'],k=d===1?rnd(1,2):d===2?2:3;
+  const e=randExpr(V,k),out=truthOf(e,V);
+  return {topic:'Truth tables',kind:'tt',V,out,ansText:'the completed column is filled in above',
+    body:`<p>Complete the output column Q of the truth table for</p><p><span class="expr">Q = ${esc(words(e))}</span></p>`,
+    steps:`<ol><li><p>Add a working column for each part of the expression, starting from the innermost, then combine them to get Q.</p>${ttHTML(e,V)}</li></ol>`,
+    hint:`List the ${1<<V.length} rows in binary order. Work out each bracket in its own column first, then use those columns for Q.`};
+},
+kmap(){
+  const d=state.diff,n=d===1?2:3,N=1<<n,V=['A','B','C'].slice(0,n);
+  const cnt=n===2?rnd(1,3):d===2?rnd(2,5):rnd(3,6);
+  const on=shuffle([...Array(N).keys()]).slice(0,cnt).sort((a,b)=>a-b);
+  const vals=Array.from({length:N},(_,m)=>on.includes(m)?1:0);
+  const sop=minSOP(n,on),tags=groupTags(sop);
+  const colNote=n===3?' The columns go 00, 01, 11, 10 (Gray code), so only one bit changes between neighbours.':'';
+  if(Math.random()<.5){
+    const gl=sop.groups.map((g,gi)=>{const desc=g.c.map((x,j)=>x===2?`${V[j]} changes`:`${V[j]} stays ${x}`).join(', ');
+      return `<li><p><i class="gt g${gi%4}" style="font-style:normal;color:var(--surface);border-radius:3px;padding:0 4px;font-size:.75rem">${gi+1}</i> Group ${gi+1} covers ${g.ms.map(m=>'m'+m).join(', ')}: ${desc}. Drop the variables that change → <b>${cubeHTML(g.c,V)}</b></p></li>`;}).join('');
+    const steps=`<ol><li><p>The 1s are in cells ${on.map(m=>'m'+m).join(', ')}.${colNote}</p></li>
+      <li><p>Circle the 1s in rectangles of 1, 2 or 4 cells (groups may wrap round the edges). Make each group as large as possible and use as few groups as possible.</p>${kmapHTML(n,vals,{tags})}</li>
+      ${gl}<li><p>Join the groups with OR (+):</p><span class="final">F = ${sopHTML(sop,V)}</span><p class="note">Another grouping with the same number and size of groups is also accepted.</p></li></ol>`;
+    return {topic:'K-maps',kind:'expr',V,vals,minLits:sop.lits,ansText:'F = '+sopHTML(sop,V),ansPlain:sopPlain(sop,V),steps,
+      body:`<p>Write the <b>simplest sum-of-products</b> expression for F from this K-map.</p>${kmapHTML(n,vals)}`,
+      hint:'Group neighbouring 1s in blocks of 2 or 4 (edges wrap). In each group, keep only the variables that stay the same: a 1 gives the letter, a 0 gives NOT the letter.'};
+  }
+  const given=n===2?pick(['sigma','tt']):d===2?pick(['sigma','tt']):pick(['tt','sop','sigma']);
+  let giv,s1;
+  if(given==='sigma'){giv=`<p><span class="expr">F = Σm(${on.join(', ')})</span></p><p class="note">Σm lists the truth-table rows (counting from 0) where F = 1.</p>`;
+    s1=`Each minterm number written in binary gives the inputs ${V.join('')}: ${on.map(m=>`m${m} = ${bin(m,n)}`).join(', ')}.`;}
+  else if(given==='tt'){giv=valsTableHTML(V,vals);s1=`F is 1 in the rows ${on.map(m=>V.join('')+' = '+bin(m,n)).join('; ')}.`;}
+  else {giv=`<p><span class="expr">F = ${sopHTML(sop,V)}</span></p>`;
+    s1=sop.groups.map(g=>`${cubeHTML(g.c,V)} is 1 in cells ${g.ms.map(m=>'m'+m).join(', ')}`).join('; ')+'.';}
+  const steps=`<ol><li><p>${s1}</p></li><li><p>Put a 1 in each of those cells and 0 everywhere else.${colNote}</p>${kmapHTML(n,vals)}</li></ol>`;
+  return {topic:'K-maps',kind:'kfill',n,vals,ansText:'the completed K-map is filled in above',steps,
+    body:`<p>Fill in the K-map for F.</p>${giv}`,
+    hint:`Each cell is one row of the truth table. Find the row number of the inputs (read ${V.join('')} as binary) and use the small m number in the corner of each cell.`};
+}
+});
+
+/* ---------- answer checking ---------- */
+function parse(kind,raw){
+  let s=String(raw).trim().replace(/[\s,_]/g,'');
+  if(!s)return {err:'Type an answer first.'};
+  if(kind==='bin'){if(!/^[01]+$/.test(s))return {err:'Binary answers use only 0 and 1.'};return {v:parseInt(s,2)};}
+  if(kind==='hex'){s=s.replace(/^(0x|#|&)/i,'').replace(/h$/i,'');if(!/^[0-9a-f]+$/i.test(s))return {err:'Hex answers use digits 0–9 and letters A–F.'};return {v:parseInt(s,16)};}
+  if(kind==='den'){s=s.replace(/[−–]/g,'-').replace(/bits?$/i,'');if(!/^-?\d+$/.test(s))return {err:'Give a whole denary number, for example −24 or 156.'};return {v:parseInt(s,10)};}
+  s=s.replace(/[−–]/g,'-').replace(/[a-z]+$/i,'');
+  if(!/^-?(\d+\.?\d*|\.\d+)$/.test(s))return {err:'Give a number, for example 2048 or 4194.304.'};
+  return {v:parseFloat(s)};
+}
+function calc(raw){
+  let s=String(raw).trim();
+  if(!s)return {err:'Type an answer first.'};
+  s=s.replace(/^[a-z ]*=/i,'').replace(/[−–]/g,'-').replace(/(\d),(?=\d{3}(\D|$))/g,'$1')
+     .replace(/[²³⁴⁵⁶⁷⁸⁹¹⁰]+/g,m=>'^'+m.split('').map(ch=>'⁰¹²³⁴⁵⁶⁷⁸⁹'.indexOf(ch)).join(''))
+     .replace(/\s*(bytes?|bits?|[kmgt]i?b)\s*$/i,'').replace(/\*\*/g,'^').replace(/[×xX·∙]/g,'*').replace(/÷|:/g,'/').replace(/\s+/g,'');
+  if(!s)return {err:'Type an answer first.'};
+  if(/[^0-9.+\-*/^()]/.test(s))return {err:'Use numbers with + − × ÷ ^ and brackets, for example 4 × 1024 × 1024.'};
+  let i=0;const peek=()=>s[i];
+  function num(){const m=s.slice(i).match(/^\d+\.?\d*|^\.\d+/);if(!m)throw 0;i+=m[0].length;return parseFloat(m[0]);}
+  function prim(){if(peek()==='('){i++;const v=add();if(peek()!==')')throw 0;i++;return v;}if(peek()==='-'){i++;return -prim();}return num();}
+  function powr(){const b=prim();if(peek()==='^'){i++;return Math.pow(b,un());}return b;}
+  function un(){if(peek()==='-'){i++;return -powr();}return powr();}
+  function mul(){let v=un();while(peek()==='*'||peek()==='/'){const o=s[i++];const r=un();v=o==='*'?v*r:v/r;}return v;}
+  function add(){let v=mul();while(peek()==='+'||peek()==='-'){const o=s[i++];const r=mul();v=o==='+'?v+r:v-r;}return v;}
+  let v;try{v=add();if(i<s.length)throw 0;}catch(e){return {err:'I could not read that calculation. Check the brackets and that every operator has a number on each side.'};}
+  if(!isFinite(v))return {err:'That calculation divides by zero.'};
+  return {v,isCalc:/[+*/^()]|\d-/.test(s)};
+}
+const near=(q,v)=>Math.abs(v-q.ans)<=0.0006+Math.abs(q.ans)*1e-12;
+function evaluate(q,inp){
+  switch(q.kind){
+  case 'mcq':case 'bit':if(inp.choice==null)return {err:'Choose an answer first.'};return {ok:inp.choice===q.ans};
+  case 'shift':{
+    if(inp.cells.some(c=>c==null))return {err:'Fill all 8 squares. Tap a square to set it to 0 or 1.'};
+    const p=parse('den',inp.den);if(p.err)return {err:'Now give the denary value of your result. '+p.err};
+    const a=parseInt(inp.cells.join(''),2)===q.ans,b=p.v===q.den;return {ok:a&&b,parts:{reg:a,den:b}};}
+  case 'add':{
+    if(inp.cells.some(c=>c==null))return {err:'Fill all 8 squares of the result.'};
+    if(inp.ovf==null)return {err:'Choose whether an overflow error happens.'};
+    const a=parseInt(inp.cells.join(''),2)===q.ans,b=(inp.ovf===1)===q.ovf;return {ok:a&&b,parts:{reg:a,ovf:b}};}
+  case 'bits':{
+    if(inp.cells.some(c=>c==null))return {err:`Fill all ${q.w} squares. Tap a square to set it to 0 or 1.`};
+    const ok=parseInt(inp.cells.join(''),2)===q.ans;
+    return {ok,signWrong:inp.cells[0]!==(q.ans>>(q.w-1))};}
+  case 'tt':case 'kfill':{
+    if(inp.cells.some(c=>c==null))return {err:q.kind==='tt'?'Fill every row of the Q column.':'Fill every cell of the K-map with 0 or 1.'};
+    const target=q.kind==='tt'?q.out:q.vals;const wrong=target.map((v,i)=>v===inp.cells[i]?-1:i).filter(i=>i>=0);
+    return {ok:!wrong.length,wrong};}
+  case 'pair':{
+    const raw=String(inp.bin).replace(/[\s_]/g,'');const b=parse('bin',raw);if(b.err)return {err:'Binary: '+b.err};
+    if(raw.length>q.w)return {err:`Your binary has ${raw.length} bits, but the question is about ${q.w} bits.`};
+    const dd=parse('den',inp.den);if(dd.err)return {err:'Denary: '+dd.err};
+    const a=b.v===q.pat,c=dd.v===q.den;return {ok:a&&c,parts:{bin:a,den:c}};}
+  case 'expr':{
+    let e;try{e=parseExpr(inp.text);}catch(x){return {err:x.message};}
+    const bad=varsOf(e).filter(v=>!q.V.includes(v));if(bad.length)return {err:`Use only ${q.V.join(', ')}. “${bad[0]}” is not in this K-map.`};
+    const tt=truthOf(e,q.V);
+    if(!tt.every((v,i)=>v===q.vals[i]))return {ok:false,msg:'That expression gives a different output for some cells. Check each group against the K-map.'};
+    if(countLits(e)>q.minLits)return {ok:false,msg:'That is equivalent, but not the simplest form. Try bigger groups or fewer groups.'};
+    return {ok:true};}
+  case 'bexpr':case 'build':case 'buildtt':return evaluateLogic(q,inp);
+  default:{
+    if(q.kind==='num'||q.allowExpr){const p=calc(inp.text);if(p.err)return p;
+      const ok=q.kind==='num'?near(q,p.v):Math.abs(p.v-q.ans)<1e-9;
+      return {ok,calc:p.isCalc?p.v:null,msg:!ok&&p.isCalc?`Your calculation works out to ${fmt(p.v)}, which isn't right. Check the multiplier for each step and whether to multiply or divide.`:''};}
+    const p=parse(q.kind,inp.text);if(p.err)return p;return {ok:p.v===q.ans};}
+  }
+}
+
+/* ---------- answer area ---------- */
+function bitSquares(signed,w=8){
+  let cells='';for(let i=0;i<w;i++)cells+=`<div class="cell"><small>${pv(i,w,signed)}</small><button type="button" class="tap abit blank${signed&&i===0?' sb':''}" data-i="${i}" id="tap${i}" aria-label="Bit ${i+1} of ${w}">·</button></div>`;
+  return `<div class="regwrap"><div class="reg" id="areg">${cells}</div></div>`;
+}
+function optButtons(group,labels,cls=''){return labels.map((l,i)=>`<button type="button" class="opt ${cls}" role="radio" aria-checked="false" data-group="${group}" data-i="${i}" id="${group}${i}">${cls?l:`<span class="k">${'ABCD'[i]}</span><span>${l}</span>`}</button>`).join('');}
+const CHECK='<button class="btn primary" type="submit">Check</button>';
+function renderAnswer(q){
+  const a=$('#ansArea');state.inp={cells:[],lost:[],choice:null,ovf:null};
+  if(state.builder){state.builder.destroy();state.builder=null;}
+  switch(q.kind){
+  case 'build':
+    a.innerHTML=`<div class="lab">Your circuit · <b>drag gates onto the board and wire them to Q</b>${q.allowed.length<7?` · only ${q.allowed.join(', ')} allowed`:''}</div><div id="qBuilder"></div><div class="row">${CHECK}</div>`;
+    state.builder=createBuilder($('#qBuilder'),{V:q.V,allowed:q.allowed});
+    break;
+  case 'buildtt':
+    state.inp.cells=Array(q.flat.length).fill(null);
+    a.innerHTML=`<div class="lab"><b>Part 1</b> · build the circuit</div><div id="qBuilder"></div><div class="lab"><b>Part 2</b> · complete the truth table (tap a cell, or type 0 and 1)</div>${ttInputHTML(q.V,q.cols)}<div class="row">${CHECK}</div>`;
+    state.builder=createBuilder($('#qBuilder'),{V:q.V,allowed:q.allowed});
+    break;
+  case 'bexpr':
+    a.innerHTML=`<label class="lab" for="answer">Boolean expression for Q · <b>e.g. (A AND B) OR NOT C, or A.B + C'</b></label>
+      <div class="row"><input id="answer" class="txt" spellcheck="false" placeholder="Q = …">${CHECK}</div>`;break;
+  case 'shift':
+    state.inp.cells=Array(8).fill(null);
+    a.innerHTML=`<div class="bench"><div class="lab">Your result · <b>tap a square to set 0 / 1, or type 0 and 1</b></div>${bitSquares(q.signed)}
+      <div class="lostline">Fallen off the end: <span id="lostBits">nothing yet</span></div>
+      <div class="tools"><button type="button" class="btn sm" id="copyB">Copy starting bits</button><button type="button" class="btn sm" id="shL">◀ Move bits left</button><button type="button" class="btn sm" id="shR">Move bits right ▶</button><button type="button" class="btn sm" id="clrB">Clear</button></div></div>
+      <label class="lab" for="denAns">Denary value of your result${q.signed?" <b>(two's complement, can be negative)</b>":''}</label>
+      <div class="row"><input id="denAns" class="txt" spellcheck="false" placeholder="${q.signed?'e.g. −36':'e.g. 92'}">${CHECK}</div>`;
+    $('#copyB').onclick=()=>{if(state.done)return;state.inp.cells=bin(q.start,8).split('').map(Number);state.inp.lost=[];clearMarks();drawTaps();};
+    $('#clrB').onclick=()=>{if(state.done)return;state.inp.cells=Array(8).fill(null);state.inp.lost=[];clearMarks();drawTaps();};
+    $('#shL').onclick=()=>{if(state.done)return;const c=state.inp.cells.shift();state.inp.lost.push(c==null?'·':c);state.inp.cells.push(null);clearMarks();drawTaps();};
+    $('#shR').onclick=()=>{if(state.done)return;const c=state.inp.cells.pop();state.inp.lost.unshift(c==null?'·':c);state.inp.cells.unshift(null);clearMarks();drawTaps();};
+    break;
+  case 'add':
+    state.inp.cells=Array(8).fill(null);
+    a.innerHTML=`<div class="bench"><div class="lab">8-bit result · <b>tap a square to set 0 / 1, or type 0 and 1</b></div><div class="sumgrid"><span class="op">=</span>${bitSquares(q.signed)}</div></div>
+      <div class="lab">Does an overflow error happen?</div><div class="opts inline" role="radiogroup" aria-label="Overflow">${optButtons('ovf',['No overflow','Overflow error'])}</div>
+      <div class="row">${CHECK}</div>`;
+    break;
+  case 'bits':
+    state.inp.cells=Array(q.w).fill(null);
+    a.innerHTML=`<div class="bench"><div class="lab">Your ${q.w}-bit answer · <b>tap a square to set 0 / 1, or type 0 and 1</b></div>${bitSquares(q.signed,q.w)}<div class="tools">${q.helpers?'<button type="button" class="btn sm" id="flipB">Flip all bits</button><button type="button" class="btn sm" id="addB">Add 1 to the rightmost bit</button>':''}<button type="button" class="btn sm" id="clrB">Clear</button></div>${q.helpers?'<div class="note">Type the positive number first, then flip all the bits, then add 1.</div>':''}</div><div class="row">${CHECK}</div>`;
+    $('#clrB').onclick=()=>{if(state.done)return;state.inp.cells=Array(q.w).fill(null);clearMarks();drawTaps();};
+    if(q.helpers){
+      $('#flipB').onclick=()=>{if(state.done)return;if(state.inp.cells.some(c=>c==null)){feedback('info','Fill all the squares with the positive number first, then flip.');return;}state.inp.cells=state.inp.cells.map(c=>1-c);clearMarks();drawTaps();};
+      $('#addB').onclick=()=>{if(state.done)return;const c=state.inp.cells;if(c.some(x=>x==null)){feedback('info','Fill all the squares first, then add 1.');return;}
+        let i=c.length-1;while(i>=0&&c[i]===1){c[i]=0;i--;}if(i>=0)c[i]=1;clearMarks();drawTaps();};
+    }
+    break;
+  case 'tt':{
+    const n=q.V.length;state.inp.cells=Array(1<<n).fill(null);
+    let h='<div class="tbl"><table class="tt"><tr>'+q.V.map(v=>`<th>${v}</th>`).join('')+'<th class="out">Q</th></tr>';
+    for(let i=0;i<1<<n;i++){const env=envOf(i,q.V);h+='<tr>'+q.V.map(v=>`<td>${env[v]}</td>`).join('')+`<td class="out"><button type="button" class="tap blank" data-i="${i}" id="tap${i}" aria-label="Q for row ${i+1}">·</button></td></tr>`;}
+    a.innerHTML=`<div class="lab">Tap each Q cell to set 0 / 1, or type 0 and 1</div>${h}</table></div><div class="row">${CHECK}</div>`;
+    break;}
+  case 'kfill':
+    state.inp.cells=Array(1<<q.n).fill(null);
+    a.innerHTML=`<div class="lab">Your K-map · <b>tap a cell to set 0 / 1, or type 0 and 1</b></div>${kmapHTML(q.n,q.vals,{input:true})}<div class="row">${CHECK}</div>`;
+    break;
+  case 'mcq':
+    a.innerHTML=`<div class="opts" role="radiogroup" aria-label="Answer options">${optButtons('choice',q.options)}</div><div class="row">${CHECK}</div>`;break;
+  case 'bit':
+    a.innerHTML=`<div class="lab">Output Q</div><div class="row"><div class="opts inline" role="radiogroup" aria-label="Output">${optButtons('choice',['0','1'],'bitopt')}</div>${CHECK}</div>`;break;
+  case 'pair':
+    a.innerHTML=`<div class="pairs"><label class="lab" for="pBin">Binary (${q.w} bits)<input id="pBin" class="txt" spellcheck="false" placeholder="${'0'.repeat(Math.min(q.w,8))}…"></label>
+      <label class="lab" for="pDen">Denary<input id="pDen" class="txt" spellcheck="false" placeholder="e.g. 31"></label></div><div class="row">${CHECK}</div>`;break;
+  case 'expr':
+    a.innerHTML=`<label class="lab" for="answer">Your expression · <b>e.g. A'B + C, A.B + C' or NOT A AND B OR C</b></label>
+      <div class="row"><input id="answer" class="txt" spellcheck="false" placeholder="F = …">${CHECK}</div>`;break;
+  default:{
+    const hint=q.kind==='bin'?'binary':q.kind==='hex'?'hexadecimal':q.kind==='num'||q.allowExpr?'a number, or a calculation such as 4 × 1024 × 1024 or 2^10 (no calculator needed)':q.kind==='den'?'denary':'a number';
+    const ph=q.kind==='bin'?'e.g. 0101 1100':q.kind==='hex'?'e.g. 3F':q.kind==='num'?'e.g. 5 × 1000 × 1000':q.allowExpr?'e.g. 2^8':q.kind==='den'?'e.g. 156':'e.g. 2048';
+    a.innerHTML=`<label class="lab" for="answer">Your answer · <b>${hint}</b></label><div class="row"><input id="answer" class="txt" spellcheck="false" placeholder="${ph}">${CHECK}</div>`;}
+  }
+  drawTaps();
+}
+function drawTaps(){
+  document.querySelectorAll('#ansArea .tap').forEach(el=>{const v=state.inp.cells[+el.dataset.i];el.textContent=v==null?'·':v;el.classList.toggle('blank',v==null);el.classList.toggle('set',v===1);});
+  const l=$('#lostBits');if(l){if(state.inp.lost.length){l.textContent=state.inp.lost.join('');l.className='lost';}else{l.textContent='nothing yet';l.className='';}}
+}
+function clearMarks(){document.querySelectorAll('#ansArea .ok,#ansArea .bad').forEach(el=>el.classList.remove('ok','bad'));}
+const ansArea=$('#ansArea');
+ansArea.addEventListener('click',e=>{
+  const t=e.target.closest('.tap');
+  if(t&&!state.done){const i=+t.dataset.i;const c=state.inp.cells;c[i]=c[i]==null?0:1-c[i];t.classList.remove('ok','bad');$('#areg')&&$('#areg').classList.remove('ok','bad');drawTaps();return;}
+  const o=e.target.closest('.opt');
+  if(o&&!state.done){const g=o.dataset.group;state.inp[g]=+o.dataset.i;
+    ansArea.querySelectorAll(`.opt[data-group="${g}"]`).forEach(x=>{x.setAttribute('aria-checked',String(x===o));x.classList.remove('ok','bad');});}
+});
+ansArea.addEventListener('keydown',e=>{
+  const t=e.target.closest('.tap');if(!t)return;
+  const list=[...ansArea.querySelectorAll('.tap')],k=list.indexOf(t),i=+t.dataset.i;
+  const next=()=>list[k+1]||ansArea.querySelector('input.txt,.opt,button[type="submit"]');
+  if(e.key==='0'||e.key==='1'){e.preventDefault();if(state.done)return;state.inp.cells[i]=+e.key;t.classList.remove('ok','bad');drawTaps();const n=next();n&&n.focus();}
+  else if(e.key==='Backspace'||e.key==='Delete'){e.preventDefault();if(state.done)return;state.inp.cells[i]=null;drawTaps();if(e.key==='Backspace'&&k>0)list[k-1].focus();}
+  else if((e.key==='ArrowRight'||e.key==='ArrowDown')&&list[k+1]){e.preventDefault();list[k+1].focus();}
+  else if((e.key==='ArrowLeft'||e.key==='ArrowUp')&&k>0){e.preventDefault();list[k-1].focus();}
+});
+function readInput(){
+  const q=state.q,s=state.inp;
+  switch(q.kind){
+    case 'shift':return {cells:s.cells,den:$('#denAns').value};
+    case 'add':return {cells:s.cells,ovf:s.ovf};
+    case 'tt':case 'kfill':case 'bits':return {cells:s.cells};
+    case 'pair':return {bin:$('#pBin').value,den:$('#pDen').value};
+    case 'mcq':case 'bit':return {choice:s.choice};
+    case 'build':return {};
+    case 'buildtt':return {cells:s.cells};
+    default:return {text:$('#answer').value};
+  }
+}
+const setMark=(el,ok)=>{if(!el)return;el.classList.remove('ok','bad');el.classList.add(ok?'ok':'bad');};
+function markParts(q,res){
+  const p=res.parts;
+  if(q.kind==='shift'){setMark($('#areg'),p.reg);setMark($('#denAns'),p.den);}
+  else if(q.kind==='bits')setMark($('#areg'),res.ok);
+  else if(q.kind==='build')state.builder&&state.builder.mark(res.ok?'ok':'bad');
+  else if(q.kind==='buildtt'){state.builder&&state.builder.mark(res.parts.build?'ok':'bad');document.querySelectorAll('#ansArea .tap').forEach(el=>setMark(el,!res.wrong.includes(+el.dataset.i)));}
+  else if(q.kind==='add'){setMark($('#areg'),p.reg);setMark($('#ovf'+state.inp.ovf),p.ovf);}
+  else if(q.kind==='tt'||q.kind==='kfill')document.querySelectorAll('#ansArea .tap').forEach(el=>setMark(el,!res.wrong.includes(+el.dataset.i)));
+  else if(q.kind==='pair'){setMark($('#pBin'),p.bin);setMark($('#pDen'),p.den);}
+  else if(q.kind==='mcq'||q.kind==='bit')setMark($('#choice'+state.inp.choice),res.ok);
+  else setMark($('#answer'),res.ok);
+}
+function revealAnswer(q){
+  switch(q.kind){
+  case 'shift':state.inp.cells=bin(q.ans,8).split('').map(Number);drawTaps();setMark($('#areg'),true);$('#denAns').value=sgn(q.den);setMark($('#denAns'),true);break;
+  case 'add':state.inp.cells=bin(q.ans,8).split('').map(Number);drawTaps();setMark($('#areg'),true);setMark($('#ovf'+(q.ovf?1:0)),true);break;
+  case 'bits':state.inp.cells=bin(q.ans,q.w).split('').map(Number);drawTaps();setMark($('#areg'),true);break;
+  case 'tt':case 'kfill':state.inp.cells=(q.kind==='tt'?q.out:q.vals).slice();drawTaps();document.querySelectorAll('#ansArea .tap').forEach(el=>setMark(el,true));break;
+  case 'pair':$('#pBin').value=bin(q.pat,q.w);$('#pDen').value=sgn(q.den);setMark($('#pBin'),true);setMark($('#pDen'),true);break;
+  case 'mcq':case 'bit':setMark($('#choice'+q.ans),true);break;
+  case 'expr':case 'bexpr':$('#answer').value=q.ansPlain;setMark($('#answer'),true);break;
+  case 'buildtt':state.inp.cells=q.flat.slice();drawTaps();document.querySelectorAll('#ansArea .tap').forEach(el=>setMark(el,true));
+  case 'build':if(state.builder){state.builder.loadExpr(q.solution);state.builder.mark('ok');state.builder.lock(true);}break;
+  }
+}
+function wrongMsg(q,res){
+  if(res.msg)return res.msg;const p=res.parts;
+  if(q.kind==='shift'){
+    if(p.reg&&!p.den)return `Your register is right, but the denary value isn't. Add up the place values above each 1${q.signed?' (the leftmost is worth −128)':''}.`;
+    if(!p.reg&&p.den)return 'Your denary value is right, but the register is not. Check which bits fall off and what fills the gaps.';
+    return 'The register and the denary value are both wrong. Try “Copy starting bits”, then use the move buttons and fill the empty squares.';}
+  if(q.kind==='add'){
+    if(p.reg&&!p.ovf)return q.signed?'Your sum is right, but check the overflow: compare the signs of the two numbers with the sign of the result.':'Your sum is right, but check the overflow: is there a carry out of the leftmost column?';
+    if(!p.reg&&p.ovf)return 'Your overflow choice is right, but the 8-bit result is not. Work right to left and remember 1 + 1 = 10 (write 0, carry 1).';
+    return 'Both the result and the overflow choice need another look. Work right to left, writing each carry above the next column.';}
+  if(q.kind==='tt'||q.kind==='kfill'){const n=res.wrong.length;return `${n} ${q.kind==='tt'?'row':'cell'}${n>1?'s are':' is'} wrong (marked in red). Tap to fix ${n>1?'them':'it'} and check again.`;}
+  if(q.kind==='bits')return res.signWrong?'Check the sign bit (the leftmost square) first: it is 1 for a negative number and 0 for a positive one.':'The sign bit is right, but some of the other bits are not. Check your working.';
+  if(q.kind==='pair'){
+    if(p.bin&&!p.den)return 'Your binary is right, but the denary value is not.';
+    if(!p.bin&&p.den)return 'Your denary value is right, but the binary pattern is not.';
+    return 'Both parts need another look.';}
+  return 'Not quite. Check your working and try again, or take a hint.';
+}
+
+/* ---------- flow ---------- */
+function renderScore(){const s=state.score;$('#sScore').textContent=`${s.right} / ${s.tried}`;$('#sStreak').textContent=s.streak;$('#sBest').textContent=s.best;store.set('bb.score',s);}
+function record(ok){if(state.counted)return;state.counted=true;const s=state.score;s.tried++;if(ok){s.right++;s.streak++;s.best=Math.max(s.best,s.streak);}else s.streak=0;renderScore();}
+function feedback(cls,html){const f=$('#fb');f.className='fb '+cls+' flash';f.innerHTML=html;f.hidden=false;}
+function showSteps(){const el=$('#steps');el.innerHTML='<h3>Working</h3>'+state.q.steps;el.hidden=false;}
+function showEmpty(){$('#empty').hidden=false;$('#qArea').hidden=true;state.q=null;}
+function newQuestion(forceId){
+  if(!state.topics.length){showEmpty();return;}
+  let id=forceId;
+  if(!id){id=pick(state.topics);if(state.topics.length>1&&id===state.last)id=pick(state.topics.filter(t=>t!==state.last));}
+  state.last=id;const q=GEN[id]();q.id=id;state.q=q;state.qn++;state.attempts=0;state.done=false;state.counted=false;
+  $('#empty').hidden=true;$('#qArea').hidden=false;
+  $('#qTopic').textContent=q.topic;$('#qDiff').textContent=DIFFN[state.diff];$('#qNum').textContent='Q'+state.qn;
+  $('#qBody').innerHTML=q.body;renderAnswer(q);$('#fb').hidden=true;$('#steps').hidden=true;
+  const c=$('#qArea');c.classList.remove('flash');void c.offsetWidth;c.classList.add('flash');
+}
+function focusFirst(){const el=ansArea.querySelector('.tap,.opt,input.txt');el&&el.focus();}
+
+$('#form').addEventListener('submit',e=>{
+  e.preventDefault();const q=state.q;if(!q)return;
+  if(state.done){newQuestion();focusFirst();return;}
+  const res=evaluate(q,readInput());
+  if(res.err){feedback('info',res.err);return;}
+  state.attempts++;markParts(q,res);
+  if(res.ok){record(true);state.done=true;
+    if((q.kind==='build'||q.kind==='buildtt')&&state.builder)state.builder.lock(true);
+    const show=['mcq','tt','kfill','build','buildtt'].includes(q.kind)?'':(q.kind==='bexpr'?'Model answer: ':'')+q.ansText+'. ';
+    const calcNote=res.calc!=null?`Your calculation gives ${fmt(res.calc)}. `:'';
+    feedback('ok',`Correct. ${calcNote}${show}Press Enter or “New question” for the next one.`);showSteps();return;}
+  record(false);
+  feedback('no',wrongMsg(q,res)+(state.attempts>=2?' You can also open “Show working”.':''));
+});
+$('#hintBtn').addEventListener('click',()=>{if(state.q)feedback('info','<b>Hint:</b> '+state.q.hint);});
+$('#solveBtn').addEventListener('click',()=>{const q=state.q;if(!q)return;
+  if(!state.done){record(false);state.done=true;revealAnswer(q);
+    feedback('info',`Answer: <b>${q.kind==='mcq'?'option '+'ABCD'[q.ans]+' ('+q.ansText+')':q.ansText}</b>. Read the working, then try a new one.`);}
+  showSteps();});
+$('#nextBtn').addEventListener('click',()=>{newQuestion();focusFirst();});
+$('#resetStats').addEventListener('click',()=>{state.score={right:0,tried:0,streak:0,best:0};renderScore();});
+
+document.querySelectorAll('.chips').forEach(box=>{
+  TOPICS.filter(t=>t.set===box.dataset.set).forEach(t=>{
+    const l=document.createElement('label');l.className='chip';
+    l.innerHTML=`<input type="checkbox" id="t-${t.id}" value="${t.id}"><span>${t.label}</span>`;
+    const cb=l.querySelector('input');cb.checked=false;
+    cb.addEventListener('change',()=>{syncTopics();if(cb.checked)newQuestion(t.id);else if(!state.q||state.q.id===t.id)newQuestion();});
+    box.appendChild(l);
+  });
+});
+function syncTopics(){state.topics=[...document.querySelectorAll('.chip input:checked')].map(c=>c.value);}
+$('#allT').addEventListener('click',()=>{document.querySelectorAll('.chip input').forEach(c=>c.checked=true);syncTopics();if(!state.q)newQuestion();});
+$('#noneT').addEventListener('click',()=>{document.querySelectorAll('.chip input').forEach(c=>c.checked=false);syncTopics();showEmpty();});
+function renderDiff(){document.querySelectorAll('#diff button').forEach(b=>b.setAttribute('aria-pressed',String(+b.dataset.d===state.diff)));}
+document.querySelectorAll('#diff button').forEach(b=>b.addEventListener('click',()=>{state.diff=+b.dataset.d;renderDiff();if(state.topics.length)newQuestion();}));
+
+/* ---------- truth table solver ---------- */
+const EXAMPLES=['(A AND B) OR NOT C','A NAND B','A XOR B XOR C',"A'B + AB'",'NOT (A OR B) AND C','(A + B)(A + C)','A NOR (B XNOR C)'];
+const exBox=document.querySelector('.exs');
+EXAMPLES.forEach(x=>{const b=document.createElement('button');b.type='button';b.className='exbtn';b.textContent=x;b.onclick=()=>{$('#solveIn').value=x;solve(x);};exBox.appendChild(b);});
+function solve(text){
+  const out=$('#solveOut');let e;
+  try{e=parseExpr(text);}catch(x){out.innerHTML=`<div class="fb no">${esc(x.message)}</div>`;return;}
+  const V=varsOf(e);
+  if(V.length>5){out.innerHTML='<div class="fb no">Use at most 5 different input letters so the table stays readable (32 rows).</div>';return;}
+  if(!V.length){out.innerHTML=`<div class="fb info">That expression has no inputs. Its value is always ${evalE(e,{})}.</div>`;return;}
+  const tt=truthOf(e,V),on=tt.map((v,i)=>v?i:-1).filter(i=>i>=0);
+  let facts=`<div class="fact"><small>Expression</small><b>Q = ${esc(words(e))}</b></div><div class="fact"><small>Rows where Q = 1</small><b>${on.length?'Σm('+on.join(', ')+')':'none: Q is always 0'}</b></div>`;
+  let km='';
+  if(V.length<=4){const s=minSOP(V.length,on);facts+=`<div class="fact"><small>Simplest sum of products</small><b>Q = ${s.one?'1':sopHTML(s,V)}</b></div>`;
+    if(V.length===2||V.length===3)km=`<div><div class="lab" style="margin-bottom:6px">K-map with groups</div>${kmapHTML(V.length,tt,{tags:groupTags(s),V})}</div>`;}
+  out.innerHTML=`<div class="facts">${facts}</div>${ttHTML(e,V)}${km}`;
+}
+$('#solveForm').addEventListener('submit',e=>{e.preventDefault();solve($('#solveIn').value);});
+
+
+/* ---------- gate symbols and circuit diagrams ---------- */
+const ALL_GATES=['AND','OR','NOT','NAND','NOR','XOR','XNOR'];
+function gateShape(op){
+  const base=(op==='AND'||op==='NAND')?'AND':(op==='NOT'?'NOT':'OR');
+  const bubble=['NAND','NOR','XNOR','NOT'].includes(op);
+  let s='';
+  if(base==='NOT')s+='<line class="glead" x1="0" y1="20" x2="12" y2="20"/>';
+  else{const lx=base==='AND'?10:13;s+=`<line class="glead" x1="0" y1="10" x2="${lx}" y2="10"/><line class="glead" x1="0" y1="30" x2="${lx}" y2="30"/>`;}
+  if(base==='AND')s+='<path class="gbody" d="M10,0 H35 A20,20 0 0 1 35,40 H10 Z"/>';
+  else if(base==='OR')s+='<path class="gbody" d="M8,0 Q22,20 8,40 Q40,40 58,20 Q40,0 8,0 Z"/>';
+  else s+='<path class="gbody" d="M12,2 L48,20 L12,38 Z"/>';
+  if(op==='XOR'||op==='XNOR')s+='<path class="gline" d="M2,0 Q16,20 2,40"/>';
+  const tip=base==='AND'?55:base==='OR'?58:48;
+  let end=tip;
+  if(bubble){s+=`<circle class="gbody" cx="${tip+4}" cy="20" r="4"/>`;end=tip+8;}
+  s+=`<line class="glead" x1="${end}" y1="20" x2="70" y2="20"/>`;
+  return s;
+}
+function gateSymbolSVG(op){return `<div class="diag"><svg viewBox="-6 -6 82 52" width="164" height="104" role="img" aria-label="A logic gate symbol">${gateShape(op)}</svg></div>`;}
+const hgt=n=>!n.op?0:1+Math.max(hgt(n.a),n.b?hgt(n.b):0);
+function layoutExpr(e){
+  let slot=0;const pos=new Map();
+  (function place(n){if(!n.op)return slot++;const ya=place(n.a);const y=n.b?(ya+place(n.b))/2:ya;pos.set(n,{col:hgt(n),y});return y;})(e);
+  return {pos,H:hgt(e),slots:slot};
+}
+function circuitSVG(e,{labels=true,env=null,V=null}={}){
+  const {pos,H,slots}=layoutExpr(e);
+  const COLW=130,SP=62,PT=22,X0=70;
+  const Ht=Math.max(slots,1)*SP+PT*2;
+  const gx=n=>X0+(pos.get(n).col-1)*COLW,gy=n=>PT+(pos.get(n).y+0.5)*SP;
+  const outX=X0+(Math.max(H,1)-1)*COLW+70+40,W=outX+44;
+  let wires='',gates='',pins='',stag=0;
+  const val=n=>env?evalE(n,env):null;
+  const term=(v,x,y)=>{pins+=`<text x="${x-7}" y="${y+5}" class="dlab" text-anchor="end">${v}${env?'='+env[v]:''}</text><circle cx="${x}" cy="${y}" r="3.5" class="dot"/>`;};
+  function wire(a,b,k,v){
+    let d;if(Math.abs(a.y-b.y)<0.5)d=`M${a.x},${a.y} H${b.x}`;
+    else{const mx=b.x-14-k*8-(stag++%2)*5;d=`M${a.x},${a.y} H${mx} V${b.y} H${b.x}`;}
+    wires+=`<path class="wire ${v===1?'hi':v===0?'lo':'plain'}" d="${d}"/>`;
+  }
+  pos.forEach((p,n)=>{
+    const x=gx(n),y=gy(n),ins=n.op==='NOT'?[n.a]:[n.a,n.b];
+    ins.forEach((c,k)=>{const ty=y+(ins.length===1?0:(k?10:-10));
+      if(c.op)wire({x:gx(c)+70,y:gy(c)},{x,y:ty},k,val(c));
+      else{const tx=x-34;term(c.v,tx,ty);wires+=`<path class="wire ${env?(env[c.v]?'hi':'lo'):'plain'}" d="M${tx},${ty} H${x}"/>`;}});
+    gates+=`<g transform="translate(${x},${y-20})">${gateShape(n.op)}${labels?`<text x="35" y="54" class="glab">${n.op}</text>`:''}</g>`;
+    if(env)gates+=`<text x="${x+74}" y="${y-6}" class="dval">${val(n)}</text>`;
+  });
+  if(!e.op){term(e.v,X0,PT+SP/2);}
+  const ry=e.op?gy(e):PT+SP/2,rx=e.op?gx(e)+70:X0;
+  wires+=`<path class="wire ${env?(val(e)?'hi':'lo'):'plain'}" d="M${rx},${ry} H${outX}"/>`;
+  pins+=`<text x="${outX+8}" y="${ry+5}" class="dlab">Q${env?'='+val(e):''}</text>`;
+  return `<div class="diag"><svg viewBox="0 0 ${W} ${Ht}" width="${W}" role="img" aria-label="Logic circuit diagram">${wires}${gates}${pins}</svg></div>`;
+}
+
+/* ---------- drag-and-drop circuit builder ---------- */
+function createBuilder(host,{V=['A','B','C'],allowed=ALL_GATES,onChange=()=>{}}={}){
+  const W=720,Hc=Math.max(320,70+V.length*80);
+  const st={vals:Object.fromEntries(V.map(v=>[v,0])),gates:[],out:null,sel:null,pend:null,drag:null,wiring:null,nid:1,locked:false};
+  host.innerHTML=`<div class="builder">
+    <div class="palette" aria-label="Gates">${allowed.map(op=>`<button type="button" class="pal" data-op="${op}" aria-label="Add ${op} gate"><svg viewBox="-3 -3 76 46" width="50" height="30" aria-hidden="true">${gateShape(op)}</svg><span>${op}</span></button>`).join('')}</div>
+    <div class="canvaswrap"><svg class="canvas" viewBox="0 0 ${W} ${Hc}" role="application" aria-label="Circuit board"><g class="layer"></g><path class="wire tmp" d=""/></svg></div>
+    <div class="bfoot"><div class="bexpr"></div><div class="tools"><button type="button" class="btn sm" data-act="tt">Show truth table</button><button type="button" class="btn sm" data-act="clear">Clear board</button></div></div>
+    <div class="bmsg note" aria-live="polite"></div><div class="btt"></div></div>`;
+  const svg=host.querySelector('svg.canvas'),layer=svg.querySelector('.layer'),tmp=svg.querySelector('.tmp'),msg=host.querySelector('.bmsg');
+  const IN_X=66,OUT={x:W-70,y:Hc/2};
+  const inY=i=>(Hc/V.length)*(i+0.5);
+  const nIn=op=>op==='NOT'?1:2;
+  const gate=id=>st.gates.find(g=>g.id===id);
+  const portIn=(g,k)=>({x:g.x,y:g.y+(nIn(g.op)===1?20:(k?30:10))});
+  const portOut=g=>({x:g.x+70,y:g.y+20});
+  const srcPt=s=>s.t==='v'?{x:IN_X,y:inY(V.indexOf(s.v))}:portOut(gate(s.id));
+  function val(s,seen=new Set()){
+    if(!s)return null;if(s.t==='v')return st.vals[s.v];const g=gate(s.id);if(!g||seen.has(g.id))return null;
+    const nx=new Set(seen);nx.add(g.id);const a=val(g.ins[0],nx);if(g.op==='NOT')return a==null?null:1-a;
+    const b=val(g.ins[1],nx);if(a==null||b==null)return null;return evalE({op:g.op,a:{k:a},b:{k:b}},{});
+  }
+  function exprOf(s){if(!s)return null;if(s.t==='v')return {v:s.v};const g=gate(s.id);if(!g)return null;
+    const a=exprOf(g.ins[0]);if(!a)return null;if(g.op==='NOT')return {op:'NOT',a};const b=exprOf(g.ins[1]);if(!b)return null;return {op:g.op,a,b};}
+  const dependsOn=(id,target)=>{const g=gate(id);return !!g&&g.ins.some(s=>s&&s.t==='g'&&(s.id===target||dependsOn(s.id,target)));};
+  const wirePath=(a,b)=>{const dx=Math.max(30,Math.abs(b.x-a.x)/2);return `M${a.x},${a.y} C${a.x+dx},${a.y} ${b.x-dx},${b.y} ${b.x},${b.y}`;};
+  const say=t=>{msg.textContent=t;};
+  function render(){
+    let h='';
+    const wire=(s,b,key)=>{const a=srcPt(s),v=val(s),d=wirePath(a,b);h+=`<path class="wire ${v===1?'hi':v===0?'lo':'unk'}" d="${d}"/><path class="wirehit" data-unwire="${key}" d="${d}"><title>Tap to remove this wire</title></path>`;};
+    st.gates.forEach(g=>g.ins.forEach((s,k)=>{if(s)wire(s,portIn(g,k),g.id+':'+k);}));
+    if(st.out)wire(st.out,OUT,'out');
+    V.forEach((v,i)=>{const y=inY(i),on=st.vals[v];
+      h+=`<g class="inpin" data-toggle="${v}"><rect x="6" y="${y-17}" width="44" height="34" rx="8" class="sw ${on?'on':''}"/><text x="28" y="${y+5}" class="swt ${on?'on':''}">${v}=${on}</text></g>`;
+      h+=`<line x1="50" y1="${y}" x2="${IN_X}" y2="${y}" class="wire ${on?'hi':'lo'}"/><circle cx="${IN_X}" cy="${y}" r="8" class="port out ${st.pend&&st.pend.t==='v'&&st.pend.v===v?'pend':''}" data-out="v:${v}"><title>Drag from here to a gate input</title></circle>`;});
+    st.gates.forEach(g=>{
+      h+=`<g class="gate ${st.sel===g.id?'sel':''}" data-gate="${g.id}" transform="translate(${g.x},${g.y})"><rect x="4" y="-4" width="62" height="48" class="ghit"/>${gateShape(g.op)}<text x="35" y="56" class="glab">${g.op}</text>`;
+      for(let k=0;k<nIn(g.op);k++){const p=portIn(g,k);h+=`<circle cx="0" cy="${p.y-g.y}" r="7" class="port in ${g.ins[k]?'conn':''}" data-in="${g.id}:${k}"/>`;}
+      h+=`<circle cx="70" cy="20" r="7" class="port out ${st.pend&&st.pend.t==='g'&&st.pend.id===g.id?'pend':''}" data-out="g:${g.id}"/>`;
+      if(st.sel===g.id&&!st.locked)h+=`<g class="del" data-del="${g.id}"><circle cx="70" cy="-10" r="10"/><text x="70" y="-5.5">×</text><title>Delete this gate</title></g>`;
+      h+='</g>';});
+    const qo=val(st.out);
+    h+=`<circle cx="${OUT.x}" cy="${OUT.y}" r="8" class="port in ${st.out?'conn':''}" data-in="out"/><line x1="${OUT.x+8}" y1="${OUT.y}" x2="${OUT.x+22}" y2="${OUT.y}" class="wire ${qo===1?'hi':'lo'}"/>
+      <circle cx="${OUT.x+40}" cy="${OUT.y}" r="18" class="lamp ${qo===1?'on':''}"/><text x="${OUT.x+40}" y="${OUT.y+5}" class="lampt ${qo===1?'on':''}">${qo==null?'Q':qo}</text>`;
+    layer.innerHTML=h;
+    const e=exprOf(st.out);
+    host.querySelector('.bexpr').innerHTML=e?`Q = <b>${esc(words(e))}</b>`:`<span class="note">${st.gates.length?'Wire every gate input, then wire a gate output to Q on the right.':'Drag a gate onto the board, or tap it to add it.'}</span>`;
+    const tt=host.querySelector('.btt');if(tt.dataset.open){tt.innerHTML=e?ttHTML(e,V):'';}
+    onChange();
+  }
+  const toSvg=e=>{const p=svg.createSVGPoint();p.x=e.clientX;p.y=e.clientY;return p.matrixTransform(svg.getScreenCTM().inverse());};
+  const clamp=g=>{g.x=Math.max(IN_X+30,Math.min(W-160,g.x));g.y=Math.max(14,Math.min(Hc-60,g.y));};
+  function addGate(op,x,y){const g={id:st.nid++,op,x:Math.round(x),y:Math.round(y),ins:op==='NOT'?[null]:[null,null]};clamp(g);st.gates.push(g);st.sel=g.id;return g;}
+  function nextSpot(){const n=st.gates.length;return {x:150+(n%4)*115,y:24+((Math.floor(n/4)+n%2)%4)*((Hc-80)/3)};}
+  function connect(src,key){
+    if(key==='out'){st.out=src;say('');return;}
+    const [id,k]=key.split(':').map(Number),g=gate(id);if(!g)return;
+    if(src.t==='g'&&(src.id===id||dependsOn(src.id,id))){say('That wire would make a loop. Wire gates from left to right.');return;}
+    g.ins[k]=src;say('');
+  }
+  function unwire(key){if(key==='out')st.out=null;else{const [id,k]=key.split(':').map(Number);const g=gate(id);if(g)g.ins[k]=null;}}
+  let palPend=null;
+  const pal=host.querySelector('.palette');
+  pal.addEventListener('pointerdown',e=>{const b=e.target.closest('.pal');if(!b||st.locked)return;e.preventDefault();palPend={op:b.dataset.op,x:e.clientX,y:e.clientY,moved:false};});
+  pal.addEventListener('click',e=>{const b=e.target.closest('.pal');if(!b||st.locked||e.detail!==0)return;const s=nextSpot();addGate(b.dataset.op,s.x,s.y);render();});
+  svg.addEventListener('pointerdown',e=>{
+    if(st.locked)return;const t=e.target;
+    const tog=t.closest('[data-toggle]');if(tog){const v=tog.dataset.toggle;st.vals[v]=1-st.vals[v];render();return;}
+    const del=t.closest('[data-del]');if(del){const id=+del.dataset.del;st.gates=st.gates.filter(g=>g.id!==id);
+      st.gates.forEach(g=>g.ins=g.ins.map(s=>s&&s.t==='g'&&s.id===id?null:s));if(st.out&&st.out.t==='g'&&st.out.id===id)st.out=null;st.sel=null;render();return;}
+    const op=t.closest('[data-out]');if(op){e.preventDefault();const [ty,id]=op.dataset.out.split(':');const src=ty==='v'?{t:'v',v:id}:{t:'g',id:+id};
+      st.wiring={src,x0:e.clientX,y0:e.clientY,moved:false};st.pend=src;render();return;}
+    const ip=t.closest('[data-in]');if(ip){e.preventDefault();if(st.pend)connect(st.pend,ip.dataset.in);else unwire(ip.dataset.in);st.pend=null;render();return;}
+    const uw=t.closest('[data-unwire]');if(uw){unwire(uw.dataset.unwire);render();return;}
+    const g=t.closest('[data-gate]');if(g){e.preventDefault();const id=+g.dataset.gate,gg=gate(id),p=toSvg(e);st.drag={id,dx:p.x-gg.x,dy:p.y-gg.y};st.sel=id;render();return;}
+    st.sel=null;st.pend=null;render();
+  });
+  const onMove=e=>{
+    if(palPend){if(Math.hypot(e.clientX-palPend.x,e.clientY-palPend.y)>6)palPend.moved=true;
+      if(palPend.moved){const r=svg.getBoundingClientRect();if(e.clientX>=r.left&&e.clientX<=r.right&&e.clientY>=r.top&&e.clientY<=r.bottom){
+        const p=toSvg(e),g=addGate(palPend.op,p.x-35,p.y-20);st.drag={id:g.id,dx:35,dy:20};palPend=null;render();}}return;}
+    if(st.drag){const p=toSvg(e),g=gate(st.drag.id);if(!g)return;g.x=Math.round(p.x-st.drag.dx);g.y=Math.round(p.y-st.drag.dy);clamp(g);render();return;}
+    if(st.wiring){if(Math.hypot(e.clientX-st.wiring.x0,e.clientY-st.wiring.y0)>6)st.wiring.moved=true;tmp.setAttribute('d',wirePath(srcPt(st.wiring.src),toSvg(e)));}
+  };
+  const onUp=e=>{
+    if(palPend){if(!palPend.moved){const s=nextSpot();addGate(palPend.op,s.x,s.y);render();}palPend=null;return;}
+    if(st.drag){st.drag=null;return;}
+    if(st.wiring){tmp.setAttribute('d','');const w=st.wiring;st.wiring=null;
+      if(w.moved){const el=document.elementFromPoint(e.clientX,e.clientY);const ip=el&&el.closest&&el.closest('[data-in]');
+        if(ip&&svg.contains(ip))connect(w.src,ip.dataset.in);st.pend=null;render();}
+      else say('Now tap a gate input (left-hand dot) or Q to connect the wire.');}
+  };
+  window.addEventListener('pointermove',onMove);window.addEventListener('pointerup',onUp);
+  host.querySelector('[data-act="clear"]').onclick=()=>{if(st.locked)return;st.gates=[];st.out=null;st.sel=null;st.pend=null;say('');render();};
+  host.querySelector('[data-act="tt"]').onclick=()=>{const tt=host.querySelector('.btt'),e=exprOf(st.out);
+    if(tt.dataset.open){delete tt.dataset.open;tt.innerHTML='';return;}
+    if(!e){say('Finish the circuit first: every gate input wired, and a wire into Q.');return;}tt.dataset.open='1';render();};
+  function loadExpr(e){
+    st.gates=[];st.out=null;st.sel=null;st.pend=null;
+    if(!e.op){st.out={t:'v',v:e.v};render();return;}
+    const {pos,H,slots}=layoutExpr(e);const colW=Math.min(140,(W-IN_X-200)/Math.max(H,1));const rowH=(Hc-20)/Math.max(slots,1);
+    const ids=new Map();
+    (function build(n){if(!n.op)return {t:'v',v:n.v};const a=build(n.a),b=n.b?build(n.b):null;const p=pos.get(n);
+      const g={id:st.nid++,op:n.op,x:Math.round(IN_X+60+(p.col-1)*colW),y:Math.round(10+(p.y+0.5)*rowH-20),ins:n.op==='NOT'?[a]:[a,b]};clamp(g);st.gates.push(g);ids.set(n,g.id);return {t:'g',id:g.id};})(e);
+    st.out={t:'g',id:ids.get(e)};render();
+  }
+  render();
+  return {getExpr:()=>exprOf(st.out),gatesUsed:()=>st.gates.map(g=>g.op),loadExpr,
+    lock(b){st.locked=b;host.querySelector('.builder').classList.toggle('locked',b);},
+    mark(c){const w=host.querySelector('.canvaswrap');w.classList.remove('ok','bad');if(c)w.classList.add(c);},
+    destroy(){window.removeEventListener('pointermove',onMove);window.removeEventListener('pointerup',onUp);}};
+}
+
+/* ---------- statement scenarios ---------- */
+const SCEN=[
+ {d:1,t:'A security light (Q) turns on when it is dark (D) and movement is detected (M).',L:{D:'it is dark',M:'movement detected'},x:'D AND M',tips:['“and” → AND']},
+ {d:1,t:'A hallway light (Q) is controlled by two switches A and B. The light is on when exactly one of the switches is up.',L:{A:'switch A up',B:'switch B up'},x:'A XOR B',tips:['“exactly one” → the inputs are different → XOR']},
+ {d:1,t:'A machine (Q) stops when the safety guard is open (G) or the emergency button is pressed (E).',L:{G:'guard open',E:'emergency button pressed'},x:'G OR E',tips:['“or” → OR']},
+ {d:1,t:'A light (Q) stays on unless both switch A and switch B are on.',L:{A:'switch A on',B:'switch B on'},x:'A NAND B',tips:['“unless both … are on” → NOT (A AND B) → NAND']},
+ {d:1,t:'A buzzer (Q) sounds when neither the front door (F) nor the back door (B) is locked.',L:{F:'front door locked',B:'back door locked'},x:'NOT (F OR B)',tips:['“neither … nor …” → NOT (F OR B) → NOR, the same as NOT F AND NOT B']},
+ {d:1,t:'A test circuit outputs 1 (Q) when the two sensors A and B agree (both 0 or both 1).',L:{A:'sensor A',B:'sensor B'},x:'A XNOR B',tips:['“agree / the same” → XNOR']},
+ {d:1,t:'A fridge alarm (Q) beeps when the door is open (D) and the timer has not run out (T is 0).',L:{D:'door open',T:'timer run out'},x:'D AND NOT T',tips:['“and” → AND','“has not” → NOT T']},
+ {d:2,t:'A car alarm (Q) sounds if the car is locked (L) and either a door is opened (D) or a window is broken (W).',L:{L:'car locked',D:'door opened',W:'window broken'},x:'L AND (D OR W)',tips:['“either … or …” → (D OR W), in brackets','“and” joins it to L → AND']},
+ {d:2,t:'A kettle (Q) switches on when the switch is on (S), there is water in it (W), and it is not already boiling (B).',L:{S:'switch on',W:'water in kettle',B:'boiling'},x:'S AND W AND NOT B',tips:['every condition must be true → AND','“not already boiling” → NOT B']},
+ {d:2,t:'A greenhouse fan (Q) runs if the temperature is high (T) or the humidity is high (H), but not if the window is open (W).',L:{T:'temperature high',H:'humidity high',W:'window open'},x:'(T OR H) AND NOT W',tips:['“T or H” → (T OR H)','“but not if W” → AND NOT W']},
+ {d:2,t:'A lift door (Q) opens when the lift has stopped (S) and either the inside button (I) or the outside button (O) is pressed.',L:{S:'lift stopped',I:'inside button',O:'outside button'},x:'S AND (I OR O)',tips:['“either … or …” → (I OR O)','“and” → AND with S']},
+ {d:2,t:'A vending machine (Q) gives a drink when a coin is inserted (C) and a button is pressed (B), unless the machine is empty (E).',L:{C:'coin inserted',B:'button pressed',E:'machine empty'},x:'C AND B AND NOT E',tips:['“and” → AND','“unless E” → AND NOT E']},
+ {d:2,t:'A sprinkler (Q) turns on if the soil is dry (D) and it is not raining (R), or if the manual switch (M) is on.',L:{D:'soil dry',R:'raining',M:'manual switch on'},x:'(D AND NOT R) OR M',tips:['“dry and not raining” → (D AND NOT R)','“or if M” → OR M']},
+ {d:2,t:'A train door (Q) can open when the train has stopped (S) and is at a platform (P), or when the emergency release (E) is pulled.',L:{S:'train stopped',P:'at a platform',E:'emergency release'},x:'(S AND P) OR E',tips:['“stopped and at a platform” → (S AND P)','“or when E” → OR E']},
+ {d:2,t:'A water pump (Q) runs when the tank is not full (F) and either the mains power (M) or the backup power (B) is on.',L:{F:'tank full',M:'mains power on',B:'backup power on'},x:'NOT F AND (M OR B)',tips:['“not full” → NOT F','“either M or B” → (M OR B)']},
+ {d:3,t:'A voting machine outputs 1 (Q) when at least two of the three judges A, B and C vote yes.',L:{A:'judge A yes',B:'judge B yes',C:'judge C yes'},x:'(A AND B) OR (A AND C) OR (B AND C)',tips:['“at least two” → any pair is enough: (A AND B), (A AND C), (B AND C)','join the pairs with OR']},
+ {d:3,t:'A safe (Q) opens when the correct code is entered (C) and either the key is turned (K) or the fingerprint matches (P), but never when the time lock (T) is on.',L:{C:'correct code',K:'key turned',P:'fingerprint matches',T:'time lock on'},x:'C AND (K OR P) AND NOT T',tips:['“either K or P” → (K OR P)','“never when T” → AND NOT T']},
+ {d:3,t:'A heater (Q) is on when the room is cold (C) and someone is home (H), or when frost protection (F) is on and the outside is freezing (Z).',L:{C:'room cold',H:'someone home',F:'frost protection on',Z:'outside freezing'},x:'(C AND H) OR (F AND Z)',tips:['two separate situations, each with “and”','join the two situations with OR']},
+ {d:3,t:'A warning light (Q) comes on when exactly one of the two engines (A, B) has failed, or when the fuel is low (F).',L:{A:'engine A failed',B:'engine B failed',F:'fuel low'},x:'(A XOR B) OR F',tips:['“exactly one of A, B” → A XOR B','“or when F” → OR F']},
+ {d:3,t:'A robot (Q) moves forward when the path is clear (P) and the battery is not low (B), and it is not the case that both bump sensors (L and R) are pressed.',L:{P:'path clear',B:'battery low',L:'left bump',R:'right bump'},x:'P AND NOT B AND (L NAND R)',tips:['“battery is not low” → NOT B','“not the case that both L and R” → L NAND R','all joined with AND']},
+];
+function legendHTML(L){return `<div class="vals legend2">${Object.entries(L).map(([k,v])=>`<span><b>${k}</b> = ${esc(v)}</span>`).join('')}</div>`;}
+function scenario(maxD){const pool=SCEN.filter(s=>s.d===maxD||(maxD===3&&s.d===2&&Math.random()<.3));return pick(pool.length?pool:SCEN);}
+const stripQ=s=>String(s).replace(/^\s*[A-Za-z]\s*=\s*/,'');
+
+/* ---------- logic generators ---------- */
+Object.assign(GEN,{
+gates(){
+  const d=state.diff,r=Math.random(),labels=d<3;
+  if(r<.14){const g=pick(ALL_GATES),opts=shuffle([g,...shuffle(ALL_GATES.filter(x=>x!==g)).slice(0,3)]);
+    return {topic:'Logic gates',kind:'mcq',options:opts,ans:opts.indexOf(g),ansText:g,body:`<p>Which logic gate is this symbol?</p>${gateSymbolSVG(g)}`,
+      steps:`<ol><li><p>${g==='NOT'?'A triangle with a bubble is NOT.':`The body shape is ${['AND','NAND'].includes(g)?'flat at the back and round at the front (AND family)':'curved at the back and pointed at the front (OR family)'}${['XOR','XNOR'].includes(g)?', with an extra curved line at the back (exclusive)':''}${['NAND','NOR','XNOR'].includes(g)?', and the bubble on the output means NOT':''}.`} The ${g} gate ${GATE_DESC[g]}.</p></li><li><span class="final">${g}</span></li></ol>`,
+      hint:'Flat back and round front: AND. Curved back and pointed front: OR. Extra line at the back: exclusive (X). A bubble on the output means NOT.'};}
+  if(r<.24){const g=pick(G2),options=shuffle([g,...shuffle(G2.filter(x=>x!==g)).slice(0,3)]),byDesc=Math.random()<.5,tbl=gateTT(g);
+    return {topic:'Logic gates',kind:'mcq',options,ans:options.indexOf(g),ansText:g,
+      body:byDesc?`<p>Which logic gate ${GATE_DESC[g]}?</p>`:`<p>Which logic gate has this truth table?</p>${tbl}`,
+      steps:`<ol><li><p>The ${g} gate ${GATE_DESC[g]}.</p>${gateSymbolSVG(g)}${tbl}</li><li><span class="final">${g}</span></li></ol>`,
+      hint:'Look at the row where both inputs are 0 and the row where both are 1. Those two rows separate most gates.'};}
+  let V,e;
+  if(d===1){V=['A','B'];e=Math.random()<.4?{op:'NOT',a:{v:'A'}}:Math.random()<.6?{op:pick(G2),a:{v:'A'},b:{v:'B'}}:randExpr(V,2);if(!e.b&&e.op==='NOT')V=['A'];}
+  else if(d===2){V=['A','B','C'];e=randExpr(V,rnd(2,3));}
+  else{V=Math.random()<.5?['A','B','C']:['A','B','C','D'];e=randExpr(V,rnd(4,5));}
+  const parts=postNodes(e);
+  if(d>=2&&r<.55){
+    const lines=parts.map(nd=>`<li><p>${nd.op} gate → <b>${esc(words(nd))}</b></p></li>`).join('');
+    return {topic:'Circuit → expression',kind:'bexpr',V,vals:truthOf(e,V),ansText:esc(words(e)),ansPlain:words(e),
+      body:`<p>Write the Boolean expression for the output Q of this circuit.</p>${circuitSVG(e,{labels})}`,
+      steps:`<ol><li><p>Name the output of each gate, working from the inputs on the left towards Q:</p></li>${lines}<li><span class="final">Q = ${esc(words(e))}</span><p class="note">Any equivalent expression is accepted.</p></li></ol>`,
+      hint:'Start at the gates nearest the inputs. Write each gate as (input1 OP input2) and feed that into the next gate.'};
+  }
+  const env={};V.forEach(v=>env[v]=rnd(0,1));const out=evalE(e,env);
+  const rows=parts.map(nd=>{const work=nd.op==='NOT'?`NOT ${evalE(nd.a,env)}`:`${evalE(nd.a,env)} ${nd.op} ${evalE(nd.b,env)}`;
+    return `<tr><td style="text-align:left">${esc(words(nd))}</td><td>${work}</td><td class="on">${evalE(nd,env)}</td></tr>`;}).join('');
+  const showExpr=d===1||(d===2&&Math.random()<.5);
+  return {topic:'Logic gates',kind:'bit',options:['0','1'],ans:out,ansText:'Q = '+out,
+    body:`<p>Work out the output Q of this circuit for these inputs.</p><div class="vals">${V.map(v=>`<span>${v} = ${env[v]}</span>`).join('')}</div>${circuitSVG(e,{labels})}${showExpr?`<p><span class="expr">Q = ${esc(words(e))}</span></p>`:''}`,
+    steps:`<ol><li><p>Follow the signals from left to right. Each gate's output is written next to it:</p>${circuitSVG(e,{labels:true,env,V})}</li>
+      <li><div class="tbl"><table><tr><th>Gate</th><th>Working</th><th>Output</th></tr>${rows}</table></div></li><li><span class="final">Q = ${out}</span></li></ol>`,
+    hint:'Write the 0 or 1 on each wire as you go. Work out the gates nearest the inputs first.'};
+},
+ttable(){
+  const d=state.diff,V=d===1?['A','B']:['A','B','C'],k=d===1?rnd(1,2):d===2?rnd(2,3):rnd(3,4);
+  const e=randExpr(V,k),out=truthOf(e,V),asCircuit=d>=2&&Math.random()<.5;
+  return {topic:'Truth tables',kind:'tt',V,out,ansText:'the completed column is filled in above',
+    body:asCircuit?`<p>Complete the output column Q of the truth table for this circuit.</p>${circuitSVG(e,{labels:d<3})}`
+      :`<p>Complete the output column Q of the truth table for</p><p><span class="expr">Q = ${esc(words(e))}</span></p>`,
+    steps:`<ol>${asCircuit?`<li><p>The circuit is Q = ${esc(words(e))}.</p></li>`:''}<li><p>Add a working column for each gate, starting nearest the inputs, then combine them to get Q.</p>${ttHTML(e,V)}</li></ol>`,
+    hint:`List the ${1<<V.length} rows in binary order. Work out each gate in its own column first, then use those columns for Q.`};
+},
+statements(){
+  const d=state.diff;
+  if(d>=2&&Math.random()<.3){
+    const n=d===2?2:3,V=['A','B','C'].slice(0,n),N=1<<n;
+    const on=shuffle([...Array(N).keys()]).slice(0,rnd(1,Math.min(4,N-1))).sort((a,b)=>a-b);
+    const vals=Array.from({length:N},(_,m)=>on.includes(m)?1:0),sop=minSOP(n,on);
+    const prods=on.map(m=>{const env=envOf(m,V);return V.map(v=>env[v]?v:'NOT '+v).join(' AND ');});
+    return {topic:'Statements → expressions',kind:'bexpr',V,vals,ansText:'Q = '+sopHTML(sop,V),ansPlain:sopPlain(sop,V),
+      body:`<p>Write a Boolean expression for Q from this truth table.</p>${valsTableHTML(V,vals,'Q')}`,
+      steps:`<ol><li><p>Pick out each row where Q = 1. Write it as an AND of the inputs, using NOT for any input that is 0:</p><ul>${prods.map(p=>`<li>${esc(p)}</li>`).join('')}</ul></li>
+        <li><p>Join those terms with OR. That is already a correct answer.</p></li>
+        <li><p>It simplifies to:</p><span class="final">Q = ${sopHTML(sop,V)}</span><p class="note">Any equivalent expression is accepted.</p></li></ol>`,
+      hint:'Each row with Q = 1 becomes one AND term. Join the terms with OR.'};
+  }
+  const s=scenario(d),e=parseExpr(s.x),V=Object.keys(s.L);
+  return {topic:'Statements → expressions',kind:'bexpr',V,vals:truthOf(e,V),ansText:'Q = '+esc(words(e)),ansPlain:words(e),
+    body:`<p>${esc(s.t)}</p>${legendHTML(s.L)}<p class="note">Write a Boolean expression for Q using these letters.</p>`,
+    steps:`<ol>${s.tips.map(t=>`<li><p>${esc(t)}</p></li>`).join('')}<li><span class="final">Q = ${esc(words(e))}</span><p class="note">Any equivalent expression is accepted.</p></li><li><p>Truth table to check against:</p>${ttHTML(e,V)}</li><li><p>As a circuit:</p>${circuitSVG(e,{V})}</li></ol>`,
+    hint:'Underline the joining words. “and / but / as well as” → AND, “or / either” → OR, “not / unless / never” → NOT. Use brackets to keep each condition together.'};
+},
+buildBasic(){
+  const d=state.diff;let V,target,solution,allowed=ALL_GATES,body,extra='';
+  if(d===3&&Math.random()<.35){
+    const only=pick(['NAND','NOR']),task=pick(['NOT','AND','OR']);
+    const SOL={NAND:{NOT:'A NAND A',AND:'(A NAND B) NAND (A NAND B)',OR:'(A NAND A) NAND (B NAND B)'},NOR:{NOT:'A NOR A',OR:'(A NOR B) NOR (A NOR B)',AND:'(A NOR A) NOR (B NOR B)'}};
+    V=task==='NOT'?['A']:['A','B'];target=parseExpr(task==='NOT'?'NOT A':`A ${task} B`);solution=parseExpr(SOL[only][task]);allowed=[only];
+    body=`<p>Build a circuit for <span class="expr">Q = ${esc(words(target))}</span> using <b>only ${only} gates</b>.</p>`;
+    extra=`<p class="note">${only} is a universal gate: any circuit can be built from it.</p>`;
+  } else if(Math.random()<.3){
+    const s=scenario(Math.min(d,2));V=Object.keys(s.L);target=parseExpr(s.x);solution=target;
+    body=`<p>${esc(s.t)}</p>${legendHTML(s.L)}<p class="note">Build the circuit for Q.</p>`;
+  } else {
+    V=d===1?['A','B']:['A','B','C'];target=randExpr(V,d===1?rnd(1,2):d===2?rnd(2,3):rnd(3,4));solution=target;
+    body=`<p>Build a circuit for</p><p><span class="expr">Q = ${esc(words(target))}</span></p>`;
+  }
+  return {topic:'Build a circuit',kind:'build',V,vals:truthOf(target,V),allowed,solution,ansText:'Q = '+esc(words(solution)),
+    body:body+extra,
+    steps:`<ol><li><p>One circuit that works (it is also loaded onto the board above):</p>${circuitSVG(solution,{V})}</li><li><p>Its truth table, which your circuit must match:</p>${ttHTML(target,V)}</li></ol>`,
+    hint:'Start with the gates nearest the inputs (the innermost brackets). Then feed their outputs into the next gate, and wire the last gate to Q. Toggle the inputs to test your circuit.'};
+}
+});
+
+GEN.build=function(){
+  if(Math.random()<.4)return GEN.buildBasic();
+  const d=state.diff;let V,target,body;const mode=pick(d===1?['expr','expr','scen']:['expr','scen','diagram']);
+  if(mode==='scen'){const s=scenario(Math.min(d,2));V=Object.keys(s.L);target=parseExpr(s.x);
+    body=`<p>${esc(s.t)}</p>${legendHTML(s.L)}`;}
+  else{V=d===1?['A','B']:['A','B','C'];target=randExpr(V,d===1?rnd(1,2):d===2?rnd(2,3):3);
+    body=mode==='diagram'?`<p>Here is a circuit diagram.</p>${circuitSVG(target,{labels:true})}`:`<p><span class="expr">Q = ${esc(words(target))}</span></p>`;}
+  const mids=d===3?postNodes(target).filter(n=>n!==target):[];
+  const cols=[...mids.map(n=>({label:words(n),node:n})),{label:'Q',node:target}];
+  const N=1<<V.length,flat=[];for(let r=0;r<N;r++){const env=envOf(r,V);cols.forEach(c=>flat.push(evalE(c.node,env)));}
+  return {topic:'Build + truth table',kind:'buildtt',V,vals:truthOf(target,V),allowed:ALL_GATES,solution:target,cols:cols.map(c=>c.label),flat,
+    ansText:'Q = '+esc(words(target)),
+    body:body+`<p class="note"><b>Part 1:</b> build ${mode==='diagram'?'this':'the'} circuit on the board. <b>Part 2:</b> complete its truth table${mids.length?', including the working columns':''}. Toggle the inputs on the board to test each row.</p>`,
+    steps:`<ol><li><p>One circuit that works (loaded onto the board above):</p>${circuitSVG(target,{V})}</li><li><p>The completed truth table:</p>${ttHTML(target,V)}</li></ol>`,
+    hint:'Build the gates nearest the inputs first. For the table, set the inputs on the board to each row in turn (000, 001, 010 …) and read the lamp, or work each gate out by hand.'};
+};
+function ttInputHTML(V,cols){
+  let h='<div class="tbl"><table class="tt"><tr>'+V.map(v=>`<th>${v}</th>`).join('')+cols.map((c,i)=>`<th class="${i===cols.length-1?'out':'mid'}">${esc(c)}</th>`).join('')+'</tr>';
+  const nc=cols.length;
+  for(let r=0;r<1<<V.length;r++){const env=envOf(r,V);h+='<tr>'+V.map(v=>`<td>${env[v]}</td>`).join('')+cols.map((c,i)=>`<td class="${i===nc-1?'out':''}"><button type="button" class="tap blank" data-i="${r*nc+i}" id="tap${r*nc+i}" aria-label="${esc(c)} for row ${r+1}">·</button></td>`).join('')+'</tr>';}
+  return h+'</table></div>';
+}
+function evaluateLogic(q,inp){
+  if(q.kind==='buildtt'){
+    const b=state.builder,e=b&&b.getExpr();
+    if(!e)return {err:'Part 1 is not finished: wire every gate input, then wire the last gate to Q.'};
+    if(inp.cells.some(c=>c==null))return {err:'Now complete every cell of the truth table (Part 2).'};
+    const tt=truthOf(e,q.V),bOk=tt.every((v,i)=>v===q.vals[i]);
+    const wrong=q.flat.map((v,i)=>v===inp.cells[i]?-1:i).filter(i=>i>=0);
+    const ok=bOk&&!wrong.length;
+    let msg='';
+    if(!bOk&&wrong.length)msg=`Your circuit doesn't match the question yet, and ${wrong.length} table cell${wrong.length>1?'s are':' is'} wrong (in red).`;
+    else if(!bOk)msg='Your truth table is right, but your circuit gives a different output for some inputs. Toggle the inputs to find where it differs.';
+    else if(wrong.length)msg=`Your circuit is right. ${wrong.length} table cell${wrong.length>1?'s are':' is'} wrong (in red). Toggle the inputs on the board to check those rows.`;
+    return {ok,parts:{build:bOk},wrong,msg};
+  }
+  if(q.kind==='bexpr'){
+    let e;try{e=parseExpr(stripQ(inp.text));}catch(x){return {err:x.message};}
+    const bad=varsOf(e).filter(v=>!q.V.includes(v));if(bad.length)return {err:`Use only the letters ${q.V.join(', ')}. “${bad[0]}” is not one of them.`};
+    const tt=truthOf(e,q.V);const wrongRows=tt.map((v,i)=>v===q.vals[i]?-1:i).filter(i=>i>=0);
+    if(wrongRows.length)return {ok:false,msg:`Your expression gives the wrong output in ${wrongRows.length} of the ${tt.length} rows of the truth table${wrongRows.length<=2?` (for example ${q.V.map(v=>v+'='+envOf(wrongRows[0],q.V)[v]).join(', ')})`:''}. Check your ANDs, ORs and brackets.`};
+    return {ok:true};
+  }
+  const b=state.builder;const e=b&&b.getExpr();
+  if(!e)return {err:'Your circuit is not finished. Wire every gate input, then wire the last gate to Q.'};
+  const bad=b.gatesUsed().filter(g=>!q.allowed.includes(g));if(bad.length)return {err:`This question only allows ${q.allowed.join(', ')} gates.`};
+  const tt=truthOf(e,q.V);const wrong=tt.filter((v,i)=>v!==q.vals[i]).length;
+  if(wrong)return {ok:false,msg:`Your circuit gives the wrong output in ${wrong} of the ${tt.length} input combinations. Toggle the inputs on the left to test it, or open its truth table.`};
+  return {ok:true};
+}
+function initTools(){
+  const tabs=document.querySelectorAll('.tabs [role="tab"]');
+  tabs.forEach(t=>t.addEventListener('click',()=>{tabs.forEach(x=>{const on=x===t;x.setAttribute('aria-selected',String(on));document.getElementById('panel-'+x.dataset.tab).hidden=!on;});}));
+  const sb=createBuilder($('#sandbox'),{V:['A','B','C']});
+  $('#practiseBuild').onclick=()=>{const cb=$('#t-build');if(!cb.checked){cb.checked=true;syncTopics();}newQuestion('build');
+    let n=0;while(state.q.kind!=='buildtt'&&n++<20)newQuestion('build');$('#card').scrollIntoView({behavior:'smooth',block:'start'});};
+  sb.loadExpr(parseExpr('(A AND B) OR NOT C'));
+}
+
+/* ---------- complex 3-input circuit building ---------- */
+const DESC3=[
+ {t:'Q is 1 when <b>exactly one</b> of the inputs A, B, C is 1.',x:"(A AND NOT B AND NOT C) OR (NOT A AND B AND NOT C) OR (NOT A AND NOT B AND C)"},
+ {t:'Q is 1 when <b>exactly two</b> of the inputs A, B, C are 1.',x:"(A AND B AND NOT C) OR (A AND NOT B AND C) OR (NOT A AND B AND C)"},
+ {t:'Q is 1 when <b>at least two</b> of the inputs A, B, C are 1 (a majority vote).',x:"(A AND B) OR (A AND C) OR (B AND C)"},
+ {t:'Q is 1 when an <b>odd number</b> of the inputs A, B, C are 1 (a parity checker).',x:"A XOR B XOR C"},
+ {t:'Q is 1 when <b>all three inputs are the same</b> (all 0 or all 1).',x:"(A AND B AND C) OR (NOT A AND NOT B AND NOT C)"},
+ {t:'Q is 1 when A is 1 and B and C are <b>different</b>.',x:"A AND (B XOR C)"},
+ {t:'Q is 1 when B and C are both 1, or when A is 0.',x:"(B AND C) OR NOT A"},
+ {t:'Q is 1 when A and B are the same, but only if C is 1.',x:"(A XNOR B) AND C"},
+ {t:'Q is 0 only when all three inputs are 1.',x:"NOT (A AND B AND C)"},
+ {t:'Q is 1 when none of the inputs are 1.',x:"NOT (A OR B OR C)"},
+ {t:'Q copies B when A is 1, and copies C when A is 0 (a multiplexer).',x:"(A AND B) OR (NOT A AND C)"},
+];
+function buildTTQuestion(topic,V,target,body,withMids,extraNote=''){
+  const mids=withMids?postNodes(target).filter(n=>n!==target):[];
+  const cols=[...mids.map(n=>({label:words(n),node:n})),{label:'Q',node:target}];
+  const N=1<<V.length,flat=[];for(let r=0;r<N;r++){const env=envOf(r,V);cols.forEach(c=>flat.push(evalE(c.node,env)));}
+  return {topic,kind:'buildtt',V,vals:truthOf(target,V),allowed:ALL_GATES,solution:target,cols:cols.map(c=>c.label),flat,ansText:'Q = '+esc(words(target)),
+    body:body+`<p class="note"><b>Part 1:</b> build the circuit on the board. <b>Part 2:</b> complete its truth table${mids.length?', including the working columns':''}.${extraNote}</p>`,
+    steps:`<ol><li><p>One circuit that works (loaded onto the board above):</p>${circuitSVG(target,{V})}</li><li><p>The completed truth table:</p>${ttHTML(target,V)}</li></ol>`,
+    hint:'Build the gates nearest the inputs first, then join them. For the table, set A, B, C on the board to each row in turn (000, 001, 010 …) and read the lamp.'};
+}
+GEN.build3=function(){
+  const d=state.diff,V=['A','B','C'],T='Complex 3-input circuit';
+  const k=d===1?3:d===2?4:rnd(5,6);
+  const r=Math.random();
+  if(r<.25){ // build from expression, then truth table
+    const e=randExpr(V,k);
+    return buildTTQuestion(T,V,e,`<p><span class="expr">Q = ${esc(words(e))}</span></p>`,d>=2);
+  }
+  if(r<.42){ // copy a circuit diagram, then truth table
+    const e=randExpr(V,k);
+    return buildTTQuestion(T,V,e,`<p>Here is a circuit with ${gateCount(e)} gates.</p>${circuitSVG(e,{labels:d<3})}`,d===3,d===3?' The gate names are not shown, so recognise the shapes.':'');
+  }
+  let target,body,why='';
+  if(r<.62){
+    const s=pick(SCEN.filter(x=>Object.keys(x.L).length===3));target=parseExpr(s.x);
+    const VV=Object.keys(s.L);
+    return {topic:T,kind:'build',V:VV,vals:truthOf(target,VV),allowed:ALL_GATES,solution:target,ansText:'Q = '+esc(words(target)),
+      body:`<p>${esc(s.t)}</p>${legendHTML(s.L)}<p class="note">Build the circuit for Q.</p>`,
+      steps:`<ol>${s.tips.map(t=>`<li><p>${esc(t)}</p></li>`).join('')}<li><p>Q = ${esc(words(target))}. One circuit that works:</p>${circuitSVG(target,{V:VV})}</li><li><p>Truth table your circuit must match:</p>${ttHTML(target,VV)}</li></ol>`,
+      hint:'Turn the sentence into an expression first: “and” → AND, “or” → OR, “not / unless” → NOT. Then build it gate by gate.'};
+  }
+  if(r<.8){
+    const dsc=pick(DESC3);target=parseExpr(dsc.x);body=`<p>Design and build a circuit with inputs A, B and C where:</p><p>${dsc.t}</p>`;
+    why=`<li><p>Write down the rows of the truth table where Q = 1, then join them with OR. A shorter equivalent is Q = ${esc(words(target))}.</p></li>`;
+  } else {
+    let on;do{on=shuffle([0,1,2,3,4,5,6,7]).slice(0,rnd(d===1?2:3,5)).sort((a,b)=>a-b);}while(minSOP(3,on).groups.length<2);
+    const sop=minSOP(3,on);target=parseExpr(sopPlain(sop,V));
+    body=`<p>Design and build a circuit with inputs A, B and C that gives this truth table.</p>${valsTableHTML(V,truthOf(target,V),'Q')}`;
+    why=`<li><p>Each row where Q = 1 is an AND term (use NOT for inputs that are 0). Join the terms with OR, then simplify, for example with a K-map: Q = ${sopHTML(sop,V)}.</p>${kmapHTML(3,truthOf(target,V),{tags:groupTags(sop)})}</li>`;
+  }
+  return {topic:T,kind:'build',V,vals:truthOf(target,V),allowed:ALL_GATES,solution:target,ansText:'Q = '+esc(words(target)),
+    body:body+'<p class="note">Any circuit that gives the right output for all 8 input combinations is accepted.</p>',
+    steps:`<ol>${why}<li><p>One circuit that works (loaded onto the board above):</p>${circuitSVG(target,{V})}</li><li><p>Truth table your circuit must match:</p>${ttHTML(target,V)}</li></ol>`,
+    hint:'List the rows where Q = 1. Each row is an AND of the three inputs (with NOT on any 0). Join the rows with OR. You can simplify first using a K-map.'};
+};
+renderDiff();renderScore();showEmpty();solve($('#solveIn').value);initTools();
+window.__BB={evaluateLogic,circuitSVG,createBuilder,GEN,evaluate,state,bin,parseExpr,truthOf,minSOP,solve};
+})();
+</script>
+
+</body></html>
